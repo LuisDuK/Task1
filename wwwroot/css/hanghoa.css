@@ -19,7 +19,7 @@ body {
 
 .header {
     display: grid;
-    grid-template-columns: 300px 220px auto;
+    grid-template-columns: 30% 20% auto;
     gap: 10px;
     margin-bottom: 20px;
     align-items: center;
@@ -34,15 +34,14 @@ body {
 
 .search-box {
     display: flex;
-    border: 1px solid #ddd;
-    border-radius: 4px;
     overflow: hidden;
 }
 
 .search-input {
     flex: 1;
     padding: 10px 12px;
-    border: none;
+    border: 1px solid #ddd;
+    border-radius: 4px;
     outline: none;
     font-size: 14px;
 }
@@ -50,7 +49,8 @@ body {
 .search-btn {
     padding: 10px 15px;
     background: white;
-    border: none;
+    border: 1px solid #ddd;
+    border-radius: 4px;
     border-left: 1px solid #ddd;
     cursor: pointer;
     color: #666;
@@ -131,15 +131,62 @@ body {
     color: white;
     padding: 10px 15px;
 }
-
-table {
+.table-wrap {
+    max-height: 75vh; 
+    overflow-y: auto;
+    overflow-x: hidden; 
+    scrollbar-gutter: stable; 
+}
+.bang-thuoc {
     width: 100%;
     border-collapse: collapse;
     font-size: 14px;
+    table-layout: fixed;
+}
+.bang-thuoc th:nth-child(1) {
+    width: 16%;
+}
+
+.bang-thuoc th:nth-child(2) {
+    width: 14%;
+}
+
+.bang-thuoc th:nth-child(3) {
+    width: 8%;
+    text-align:center;
+}
+
+.bang-thuoc th:nth-child(4) {
+    width: 9%;
+    text-align: center;
+}
+
+.bang-thuoc th:nth-child(5) {
+    width: 13%;
+}
+
+.bang-thuoc th:nth-child(6) {
+    width: 13%;
+}
+
+.bang-thuoc th:nth-child(7) {
+    width: 7%;
+}
+
+.bang-thuoc th:nth-child(8) {
+    width: 8%;
+}
+
+.bang-thuoc th:nth-child(9) {
+    width: 9%;
+}
+
+.bang-thuoc th:nth-child(10) {
+    width: 7%;
 }
 
 thead {
-    background: #f9fafb;
+    background: #DDDDDD;
     border-top: 1px solid #e5e7eb;
     border-bottom: 1px solid #e5e7eb;
 }
@@ -151,15 +198,19 @@ th {
     color: #374151;
     font-size: 13px;
     text-align: center;
+    border: 1px solid #CCCCCC;
 }
 
 td {
     padding: 12px 8px;
-    border-bottom: 1px solid #f3f4f6;
+    border: 1px solid #CCCCCC;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 tbody tr:hover {
-    background: #f9fafb;
+    background: #DDDDDD;
 }
 
 .action-icons {

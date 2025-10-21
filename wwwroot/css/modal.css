@@ -73,14 +73,14 @@
     }
 
 .modal-body {
-    padding: 15px;
+    padding: 10px 15px;
 }
 
 .form-row {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 10px;
-    margin-bottom: 10px;
+    margin-bottom: 5px;
 }
 
     .form-row.two-col {
@@ -141,7 +141,9 @@
     background: white;
     cursor: pointer;
 }
-
+.input-required {
+        background: #fff4d9;
+    }
 .checkbox-group {
     display: flex;
     align-items: center;
@@ -163,7 +165,7 @@
 }
 
 .modal-footer {
-    padding: 16px 24px;
+    padding: 5px 24px;
     border-top: 1px solid #e5e7eb;
     display: flex;
     justify-content: flex-end;

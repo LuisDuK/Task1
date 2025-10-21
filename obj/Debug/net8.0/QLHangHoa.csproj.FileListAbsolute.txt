@@ -166,3 +166,4 @@ D:\HocCsharp\QLHangHoa\QLHangHoa\obj\Debug\net8.0\refint\QLHangHoa.dll
 D:\HocCsharp\QLHangHoa\QLHangHoa\obj\Debug\net8.0\QLHangHoa.pdb
 D:\HocCsharp\QLHangHoa\QLHangHoa\obj\Debug\net8.0\QLHangHoa.genruntimeconfig.cache
 D:\HocCsharp\QLHangHoa\QLHangHoa\obj\Debug\net8.0\ref\QLHangHoa.dll
+D:\HocCsharp\QLHangHoa\QLHangHoa\obj\Debug\net8.0\QLHangHoa.sourcelink.json

@@ -41,8 +41,8 @@
                 row.innerHTML = `
                             <td>${item.MaNhom ?? ''}</td>
                             <td>${item.TenHang ?? ''}</td>
-                            <td>${item.MaHang ?? ''}</td>
-                            <td>${item.MaDuong ?? item.DuongDungId ?? ''}</td>
+                            <td style="text-align: center">${item.MaHang ?? ''}</td>
+                            <td style="text-align: center">${item.MaDuong ?? ''}</td>
                             <td>${item.HamLuong ?? ''}</td>
                             <td>${item.HoatChat ?? ''}</td>
                             <td>${item.MaAnhXa ?? ''}</td>

@@ -18,9 +18,9 @@
             <div class="search-box">
                 <input type="text" id="searchInput" class="search-input" placeholder="Tìm kiếm thông tin">
                 <button class="search-btn"><i class="fas fa-chevron-down"></i></button>
-                <button class="search-btn" onclick="searchData()"><i class="fas fa-search"></i></button>
+                <button class="search-btn" style="margin-left:10px;" onclick="searchData()"><i class="fas fa-search"></i></button>
             </div>
-
+            
             <div class="dropdown-box">
                 <select id="filterNhom" class="form-select-filter" onchange="filterByNhom()">
                     <option value="" >-- Theo nhóm hàng hóa --</option>
@@ -48,27 +48,27 @@
                 </button>
             </div>
         </div>
-
-        <table>
-            <thead>
-                <tr>
-                    <th>Nhóm hàng hóa</th>
-                    <th>Tên hàng hóa</th>
-                    <th>Mã hàng hóa</th>
-                    <th>Mã đường dùng</th>
-                    <th>Hàm lượng</th>
-                    <th>Hoạt chất</th>
-                    <th>Mã ánh xạ</th>
-                    <th>BHYT</th>
-                    <th>Thông tin thầu</th>
-                    <th>Tùy chọn</th>
-                </tr>
-            </thead>
-            <tbody id="tableBody">
+        <div class="table-wrap">
+            <table class="bang-thuoc">
+                <thead>
+                    <tr>
+                        <th>Nhóm hàng hóa</th>
+                        <th>Tên hàng hóa</th>
+                        <th>Mã hàng hóa</th>
+                        <th>Mã đường dùng</th>
+                        <th>Hàm lượng</th>
+                        <th>Hoạt chất</th>
+                        <th>Mã ánh xạ</th>
+                        <th>BHYT</th>
+                        <th>Thông tin thầu</th>
+                        <th>Tùy chọn</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
                 
-            </tbody>
-        </table>
-
+                </tbody>
+            </table>
+        </div>
         <div class="pagination">
             <div class="page-size">
                 <select id="pageSize" onchange="changePageSize()">
@@ -97,7 +97,7 @@
                             <div  style="display: flex; gap: 16px;">
                                 <div class="form-group" style="flex: 7;">
                                     <label class="form-label">Nhóm hàng hóa <span class="required">*</span></label>
-                                    <select class="form-select" name="NhomHangHoaId" required>
+                                    <select class="form-select input-required" name="NhomHangHoaId" required>
                                         <option value="">-- Nhóm hàng hóa --</option>
                             
                                     </select>
@@ -105,12 +105,12 @@
 
                                 <div class="form-group" style="flex: 3;">
                                     <label class="form-label">Mã hàng hóa <span class="required">*</span></label>
-                                    <input type="text" class="form-input" name="MaHang" placeholder="Auto" value="Auto" readonly>
+                                    <input type="text" class="form-input input-required" name="MaHang" placeholder="Auto" value="Auto" readonly>
                                 </div>
                             </div>
                             <div class="form-group">
                                 <label class="form-label">Tên hàng hóa <span class="required">*</span></label>
-                                <input type="text" class="form-input" name="TenHang" placeholder="Nhập tên hàng hóa" required>
+                                <input type="text" class="form-input input-required" name="TenHang" placeholder="Nhập tên hàng hóa" required>
                             </div>
                         </div>
 
@@ -118,21 +118,21 @@
                         <div class="form-row five-col">
                             <div class="form-group">
                                 <label class="form-label">Đơn vị tính nhập <span class="required">*</span></label>
-                                <select class="form-select" name="DonViTinhNhap" required>
+                                <select class="form-select input-required" name="DonViTinhNhap" required>
                                     <option value="">-- Đơn vị tính nhập --</option>
                                 </select>
                             </div>
 
                             <div class="form-group">
                                 <label class="form-label">Đơn vị tính xuất <span class="required">*</span></label>
-                                <select class="form-select" name="DonViTinhXuat" required>
+                                <select class="form-select input-required" name="DonViTinhXuat" required>
                                     <option value="">-- Đơn vị tính xuất --</option>
                                 </select>
                             </div>
 
                             <div class="form-group">
                                 <label class="form-label">Số lượng quy đổi <span class="required">*</span></label>
-                                <input type="number" class="form-input" name="SoLuongQuyDoi" placeholder="Nhập số lượng quy đổi" required>
+                                <input type="number" class="form-input input-required" name="SoLuongQuyDoi" placeholder="Nhập số lượng quy đổi" required>
                             </div>
                         
                             <div class="form-group">
@@ -184,7 +184,7 @@
                         <div class="form-row five-col">
                             <div class="form-group">
                                 <label class="form-label">Mã ánh xạ <span class="required">*</span></label>
-                                <input type="text" class="form-input" name="MaAnhXa" placeholder="Nhập Mã ánh xạ, mã BHYT" required>
+                                <input type="text" class="form-input input-required" name="MaAnhXa" placeholder="Nhập Mã ánh xạ, mã BHYT" required>
                             </div>
 
                             <div class="form-group">
@@ -198,14 +198,14 @@
                             </div>
                             <div class="form-group">
                                 <label class="form-label">Mã nhóm chi phí <span class="required">*</span></label>
-                                <select class="form-select" name="NhomChiPhi" required>
+                                <select class="form-select input-required" name="NhomChiPhi" required>
                                     <option value="">-- Nhóm chi phí --</option>
                                 </select>
                             </div>
 
                             <div class="form-group">
                                 <label class="form-label">Nguồn chi trả <span class="required">*</span></label>
-                                <select class="form-select" name="NguonChiTra" required>
+                                <select class="form-select input-required" name="NguonChiTra" required>
                                     <option value="">-- Nguồn chi trả --</option>
                                 </select>
                             </div>
