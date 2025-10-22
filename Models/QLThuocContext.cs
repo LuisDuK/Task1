@@ -195,6 +195,7 @@ public partial class QLThuocContext : DbContext
             entity.ToTable("hang_san_xuat");
 
             entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.MaHangSx).HasColumnName("ma_hang_sx");
             entity.Property(e => e.NuocId).HasColumnName("nuoc_id");
             entity.Property(e => e.TenHang)
                 .HasMaxLength(255)

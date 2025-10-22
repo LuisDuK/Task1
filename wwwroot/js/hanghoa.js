@@ -282,9 +282,10 @@ function initModalDropdowns() {
     const selectHangSX = document.querySelector('select[name="HangSanXuat"]');
     hangSanXuat.forEach(item => {
         const option = document.createElement('option');
-        option.value = item.Id;
+        option.value = item.MaHangSx;
         option.textContent = item.TenHang;
         selectHangSX.appendChild(option);
+        
     });
 
     // Nhóm chi phí

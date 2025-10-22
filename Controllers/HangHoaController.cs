@@ -81,7 +81,7 @@ namespace QLHangHoa.Controllers
                 .AsNoTracking()
                 .Select(h => new {
               
-                    MaHang = h.Id,
+                    MaHang = h.MaHangSx,
                     TenHang = h.TenHang
                 })
                 .OrderBy(x => x.TenHang)

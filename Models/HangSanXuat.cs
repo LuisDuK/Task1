@@ -6,6 +6,7 @@ namespace QLHangHoa.Models;
 public partial class HangSanXuat
 {
     public long Id { get; set; }
+    public string MaHangSx { get; set; } = null!;
 
     public string TenHang { get; set; } = null!;
 
