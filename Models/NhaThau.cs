@@ -18,13 +18,5 @@ public partial class NhaThau
     public string? Email { get; set; }
 
     public string? NguoiDaiDien { get; set; }
-
-    public string? GhiChu { get; set; }
-
-    public DateTime NgayTao { get; set; }
-
-    public DateTime NgayCapNhat { get; set; }
-
-  
     public virtual ICollection<HangHoa> HangHoas { get; set; } = new List<HangHoa>();
 }

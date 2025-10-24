@@ -9,6 +9,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quản lý Hàng hóa</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
     <link rel="stylesheet" href="~/css/hanghoa.css" />
     <link rel="stylesheet" href="~/css/modal.css" />
 </head>
@@ -38,7 +39,7 @@
                     Xuất Excel
                 </button>
 
-                <button class="btn btn-primary" onclick="openModal()">
+                <button class="btn btn-primary" onclick="onAddNewClick()">
                     <i class="fas fa-plus"></i>
                     Thêm mới
                 </button>
@@ -86,18 +87,19 @@
         <div class="modal-overlay" id="modalOverlay">
             <div class="modal">
                 <div class="modal-header">
-                    <h2 class="modal-title">Thêm hàng hóa</h2>
+                    <h2 class="modal-title" id="modalTitle">Thêm hàng hóa</h2>
                     <button class="close-btn" onclick="closeModal()">&times;</button>
                 </div>
 
-                <div class="modal-body">
-                    <form id="productForm">
+                <div class="modal-body"> 
+                    <form id="productForm" asp-action="themhanghoa" method="post">
+                        <input type="hidden" id="Id" name="Id">
                         <!-- Row 1 -->
                         <div class="form-row two-col">
                             <div  style="display: flex; gap: 16px;">
                                 <div class="form-group" style="flex: 7;">
                                     <label class="form-label">Nhóm hàng hóa <span class="required">*</span></label>
-                                    <select class="form-select input-required" name="NhomHangHoaId" required>
+                                    <select class="form-select input-required" name="MaNhom" required>
                                         <option value="">-- Nhóm hàng hóa --</option>
                             
                                     </select>
@@ -118,14 +120,14 @@
                         <div class="form-row five-col">
                             <div class="form-group">
                                 <label class="form-label">Đơn vị tính nhập <span class="required">*</span></label>
-                                <select class="form-select input-required" name="DonViTinhNhap" required>
+                                <select class="form-select input-required" name="DvtNhapId" required>
                                     <option value="">-- Đơn vị tính nhập --</option>
                                 </select>
                             </div>
 
                             <div class="form-group">
                                 <label class="form-label">Đơn vị tính xuất <span class="required">*</span></label>
-                                <select class="form-select input-required" name="DonViTinhXuat" required>
+                                <select class="form-select input-required" name="DvtXuatId" required>
                                     <option value="">-- Đơn vị tính xuất --</option>
                                 </select>
                             </div>
@@ -144,9 +146,6 @@
                                 <label class="form-label">Đường dùng</label>
                                 <select class="form-select" name="DuongDungId">
                                     <option value="">-- Đường dùng --</option>
-                                    <option>Uống</option>
-                                    <option>Tiêm</option>
-                                    <option>Bôi ngoài da</option>
                                 </select>
                             </div>
                         </div>
@@ -154,14 +153,14 @@
                         <div class="form-row three-col">
                             <div class="form-group">
                                 <label class="form-label">Nước sản xuất</label>
-                                <select class="form-select" name="NuocSanXuat">
+                                <select class="form-select" name="NuocId">
                                     <option value="">-- Nước sản xuất --</option>
                                 </select>
                             </div>
 
                             <div class="form-group">
                                 <label class="form-label">Hãng sản xuất</label>
-                                <select class="form-select" name="HangSanXuat">
+                                <select class="form-select" name="HangSxId">
                                     <option value="">-- Hãng sản xuất --</option>
                                 </select>
                             </div>
@@ -176,7 +175,7 @@
 
                             <div class="form-group">
                                 <label class="form-label">Hoạt chất</label>
-                                <input type="text" class="form-input" name="HoatChat" placeholder="Nhập hoạt chất">
+                                <input type="text" class="form-input" name="HoatChatText" placeholder="Nhập hoạt chất">
                             </div>
                         </div>
 
@@ -189,23 +188,23 @@
 
                             <div class="form-group">
                                 <label class="form-label">Mã bar code</label>
-                                <input type="text" class="form-input" name="BarCode" placeholder="Nhập mã bar code">
+                                <input type="text" class="form-input" name="MaBarCode" placeholder="Nhập mã bar code">
                             </div>
 
                             <div class="form-group">
                                 <label class="form-label">Mã PP chế biến</label>
-                                <input type="text" class="form-input" name="MaPPCheBien" placeholder="Nhập mã phương pháp chế biến">
+                                <input type="text" class="form-input" name="MaPpCheBien" placeholder="Nhập mã phương pháp chế biến">
                             </div>
                             <div class="form-group">
                                 <label class="form-label">Mã nhóm chi phí <span class="required">*</span></label>
-                                <select class="form-select input-required" name="NhomChiPhi" required>
+                                <select class="form-select input-required" name="NhomChiPhiId" required>
                                     <option value="">-- Nhóm chi phí --</option>
                                 </select>
                             </div>
 
                             <div class="form-group">
                                 <label class="form-label">Nguồn chi trả <span class="required">*</span></label>
-                                <select class="form-select input-required" name="NguonChiTra" required>
+                                <select class="form-select input-required" name="NguonChiTraId" required>
                                     <option value="">-- Nguồn chi trả --</option>
                                 </select>
                             </div>
@@ -239,7 +238,7 @@
                             <div style="display: flex; gap: 16px;">
                                 <div class="form-group" style="flex: 7; ">
                                     <label class="form-label">Nhà thầu</label>
-                                    <select class="form-select" name="NhaThau">
+                                    <select class="form-select" name="MaNhaThau">
                                         <option value="">-- Nhà thầu --</option>
                                     </select>
                                 </div>
@@ -265,34 +264,71 @@
 
                             <div class="form-group">
                                 <label class="form-label">SL min</label>
-                                <input type="number" class="form-input" name="SLMin" placeholder="SL min">
+                                <input type="number" class="form-input" name="SlMin" placeholder="SL min">
                             </div>
 
                             <div class="form-group">
                                 <label class="form-label">SL max</label>
-                                <input type="number" class="form-input" name="SLMax" placeholder="SL max">
+                                <input type="number" class="form-input" name="SlMax" placeholder="SL max">
                             </div>
                             <div class="form-group">
                                 <label class="form-label">Số ngày dùng thuốc</label>
-                                <input type="number" class="form-input" name="SoNgayDungThuoc" value="90">
+                                <input type="number" class="form-input" name="SoNgayDung" value="90">
                             </div>
 
                             <div class="checkbox-group">
-                                <input type="checkbox" id="bhyt" name="Bhyt" class="checkbox-input">
+                                <input type="checkbox" id="bhyt" name="Bhyt" value="True" class="checkbox-input">
                                 <label for="bhyt" class="checkbox-label">BHYT</label>
                             </div>
-                        </div>
+                        </div> <div class="modal-footer">
+                            <button type="submit" class="btn btn-primary" >Lưu</button>
+                           
+                        
                     </form>
+                    <button type="button" class="btn btn-secondary" onclick="closeModal()">Đóng</button>
+                </div>
                 </div>
 
-                <div class="modal-footer">
-                    <button class="btn btn-primary" onclick="saveProduct()">Lưu</button>
-                    <button class="btn btn-secondary" onclick="closeModal()">Đóng</button>
-                </div>
+               
+                
             </div>
         </div>
+
+        <div class="modal-overlay" id="deleteOverlay">
+            <div class="modal" style="max-width: 400px;">
+                <div class="modal-header">
+                    <h2 class="modal-title">Xác nhận xóa</h2>
+                    <button class="close-btn" onclick="closeDeleteModal()">&times;</button>
+                </div>
+                 <form id="deleteForm" asp-controller="HangHoa" asp-action="xoahanghoa" method="post">
+                <div class="modal-body">
+                    <p>Bạn có chắc chắn muốn xóa hàng hóa này không?</p>
+                    <input type="hidden" name="MaHang" id="deleteMaHang" />
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-danger" onclick="confirmDelete()">Xóa</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeDeleteModal()">Hủy</button>
+                </div>
+            </form>
+            </div>
+        </div>
+        <div class="modal-overlay" id="notifyOverlay" style="display:none">
+            <div class="modal" style="max-width:400px;">
+                <div class="modal-header">
+                    <h2 class="modal-title" id="notifyTitle">Thông báo</h2>
+                    <button class="close-btn" onclick="closeNotifyModal()">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <p id="notifyMessage">...</p>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-primary" onclick="closeNotifyModal()">Đóng</button>
+                </div>
+            </div>
     </div>
-    
+
+    </div>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script>
         const allData = @Html.Raw(ViewBag.DataJson ?? "[]");
         const nhomHangHoa = @Html.Raw(ViewBag.NhomHangHoaJson ?? "[]");
@@ -302,7 +338,16 @@
         const hangSanXuat = @Html.Raw(ViewBag.HangSanXuatJson ?? "[]");
         const nhomChiPhi = @Html.Raw(ViewBag.NhomChiPhiJson ?? "[]");
         const nhaThau = @Html.Raw(ViewBag.NhaThauJson ?? "[]");
-     
+        const nguonChiTra = @Html.Raw(ViewBag.NguonChiTraJson ?? "[]");
+
+        document.addEventListener("DOMContentLoaded", function () {
+            
+            var success = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(TempData["Success"]));
+            var error = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(TempData["Error"]));
+
+            if (success) { showSuccess(success); }
+            if (error) { showError(error); }
+        });
     </script>
     <script src="~/js/hanghoa.js"></script>
 </body>

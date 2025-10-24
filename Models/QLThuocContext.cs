@@ -85,7 +85,6 @@ public partial class QLThuocContext : DbContext
             entity.Property(e => e.DangBaoChe)
                 .HasMaxLength(255)
                 .HasColumnName("dang_bao_che");
-            entity.Property(e => e.DuongDungId).HasColumnName("duong_dung_id");
             entity.Property(e => e.DvtNhapId).HasColumnName("dvt_nhap_id");
             entity.Property(e => e.DvtXuatId).HasColumnName("dvt_xuat_id");
             entity.Property(e => e.GiaThau)
@@ -117,7 +116,7 @@ public partial class QLThuocContext : DbContext
             entity.Property(e => e.NguonChiTraId).HasColumnName("nguon_chi_tra_id");
             entity.Property(e => e.MaNhaThau)
                 .HasMaxLength(255)
-                .HasColumnName("nha_thau");
+                .HasColumnName("ma_nha_thau");
             entity.Property(e => e.NhomChiPhiId).HasColumnName("nhom_chi_phi_id");
             entity.Property(e => e.NuocId).HasColumnName("nuoc_id");
             entity.Property(e => e.QuyCachDongGoi)
@@ -151,7 +150,7 @@ public partial class QLThuocContext : DbContext
                 .HasColumnName("ti_le_thanh_toan");
 
             entity.HasOne(d => d.DuongDung).WithMany(p => p.HangHoas)
-                .HasForeignKey(d => d.DuongDungId)
+                .HasForeignKey(d => d.MaDuongDung)
                 .HasConstraintName("FK_hh_duong");
 
             entity.HasOne(d => d.DvtNhap).WithMany(p => p.HangHoaDvtNhaps)
@@ -186,8 +185,15 @@ public partial class QLThuocContext : DbContext
             entity.HasOne(d => d.Nuoc).WithMany(p => p.HangHoas)
                 .HasForeignKey(d => d.NuocId)
                 .HasConstraintName("FK_hh_nuoc");
+            entity.HasOne(d => d.NhaThau).WithMany(p => p.HangHoas)
+                .HasForeignKey(d => d.MaNhaThau)
+                .HasConstraintName("FK_hh_nha_thau");
         });
-
+        modelBuilder.Entity<HangHoa>()
+           .HasOne(h => h.DuongDung)
+           .WithMany(d => d.HangHoas)
+           .HasForeignKey(h => h.MaDuongDung)
+           .HasPrincipalKey(d => d.MaDuong);
         modelBuilder.Entity<HangSanXuat>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PK__hang_san__3213E83F85C37EAC");
@@ -278,15 +284,15 @@ public partial class QLThuocContext : DbContext
         {
             e.ToTable("nha_thau", "dbo");
             e.HasKey(x => x.Id);
-
             e.Property(x => x.MaNhaThau).HasColumnName("ma_nha_thau");
             e.Property(x => x.TenNhaThau).HasColumnName("ten_nha_thau");
             e.Property(x => x.DiaChi).HasColumnName("dia_chi");
             e.Property(x => x.DienThoai).HasColumnName("dien_thoai");
             e.Property(x => x.Email).HasColumnName("email");
             e.Property(x => x.NguoiDaiDien).HasColumnName("nguoi_dai_dien");
+            e.HasAlternateKey(x => x.MaNhaThau);
         });
-
+       
         OnModelCreatingPartial(modelBuilder);
     }
 

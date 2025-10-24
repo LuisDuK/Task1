@@ -21,8 +21,6 @@ public partial class HangHoa
 
     public string? MaDuongDung { get; set; }
 
-    public long? DuongDungId { get; set; }
-
     public long? NuocId { get; set; }
 
     public long? HangSxId { get; set; }
@@ -55,7 +53,7 @@ public partial class HangHoa
 
     public string? ThongTinThau { get; set; }
 
-    public string? MaNhaThau { get; set; }
+    public long? MaNhaThau { get; set; }
 
     public decimal? GiaThau { get; set; }
 
