@@ -19,8 +19,190 @@ namespace QLHangHoa.Controllers
         {
             var data = await _context.HangHoas
            .Include(h => h.NhomHangHoa)
-           .Include(h => h.DuongDung)
+            .Include(h => h.DvtNhap)
+            .Include(h => h.DvtXuat)
+            .Include(h => h.DuongDung)
+            .Include(h => h.Nuoc)
+            .Include(h => h.HangSx)
+            .Include(h => h.NhaThau)
+            .Include(h => h.NhomChiPhi)
+            .Include(h => h.NguonChiTra)
            .AsNoTracking()
+           .Where(h => h.TrangThai == 1)
+           .Select(h => new
+           {
+               Id = h.Id,
+
+               // Row 1
+               IdNhom = h.NhomHangHoa.Id,
+               MaNhom = h.NhomHangHoa.MaNhom,
+               TenNhom = h.NhomHangHoa.TenNhom,
+               MaHang = h.MaHang,
+               TenHang = h.TenHang,
+
+               // Row 2
+               DvtNhapId = h.DvtNhapId,
+               DvtXuatId = h.DvtXuatId,
+               SoLuongQuyDoi = h.SoLuongQuyDoi,
+               MaDuong = h.MaDuongDung,
+
+               DonViTinhNhap = h.DvtNhap != null ? h.DvtNhap.TenDvt : "",
+               DonViTinhXuat = h.DvtXuat != null ? h.DvtXuat.TenDvt : "",
+               DuongDung = h.DuongDung != null ? h.DuongDung.TenDuong : "",
+               // Row 3
+               NuocId = h.NuocId,
+               HangSxId = h.HangSxId,
+               NuocSanXuat = h.Nuoc != null ? h.Nuoc.TenNuoc : "",
+               HangSanXuat = h.HangSx != null ? h.HangSx.TenHang : "",
+
+               // Row 4
+               HamLuong = h.HamLuong,
+               HoatChat = h.HoatChatText,
+
+               // Row 5
+               MaAnhXa = h.MaAnhXa,
+               MaBarCode = h.MaBarcode,
+               MaPpCheBien = h.MaPpCheBien,
+               NhomChiPhiId = h.NhomChiPhiId,
+               NguonChiTraId = h.NguonChiTraId,
+               MaNhomChiPhi = h.NhomChiPhi != null ? h.NhomChiPhi.TenNhom : "",
+               NguonChiTra = h.NguonChiTra != null ? h.NguonChiTra.TenNguon : "",
+               // Row 6
+               DangBaoChe = h.DangBaoChe,
+               QuyCachDongGoi = h.QuyCachDongGoi,
+
+               // Row 7
+               SoDangKy = h.SoDangKy,
+               ThongTinThau = h.ThongTinThau,
+               IdNhaThau = h.NhaThau != null ? (int?)h.NhaThau.Id : null,
+               NhaThau = h.NhaThau != null ? h.NhaThau.TenNhaThau : "",
+               MaNhaThau = h.MaNhaThau,
+               GiaThau = h.GiaThau,
+
+               // Row 8
+               TiLeBHYT = h.TiLeBhyt,
+               TiLeThanhToan = h.TiLeThanhToan,
+               SlMin = h.SlMin,
+               SlMax = h.SlMax,
+               SoNgayDung = h.SoNgayDung,
+               Bhyt = h.Bhyt
+           })
+           .OrderBy(x => x.TenHang)
+           .ToListAsync();
+
+            var nhomHangHoa = await _context.NhomHangHoas
+                .AsNoTracking()
+                .Select(n => new
+                {
+                    Id = n.Id,
+                    MaNhom = n.MaNhom,
+                    TenNhom = n.TenNhom
+                })
+                .OrderBy(x => x.TenNhom)
+                .ToListAsync();
+            ViewBag.NhomHangHoaJson = JsonSerializer.Serialize(nhomHangHoa);
+
+            var donViTinh = await _context.DonViTinhs
+                .AsNoTracking()
+                .Select(d => new
+                {
+                    Id = d.Id,
+                    MaDonVi = d.MaDvt,
+                    TenDonVi = d.TenDvt
+                })
+                .OrderBy(x => x.TenDonVi)
+                .ToListAsync();
+
+            // Lấy danh sách đường dùng 
+            var duongDung = await _context.DuongDungs
+                .AsNoTracking()
+                .Select(d => new
+                {
+                    Id = d.Id,
+                    MaDuong = d.MaDuong,
+                    TenDuong = d.TenDuong
+                })
+                .OrderBy(x => x.TenDuong)
+                .ToListAsync();
+
+            // Lấy danh sách nước sản xuất
+            var nuocSanXuat = await _context.NuocSanXuats
+                .AsNoTracking()
+                .Select(n => new
+                {
+                    Id = n.Id,
+                    MaNuoc = n.MaNuoc,
+                    TenNuoc = n.TenNuoc
+                })
+                .OrderBy(x => x.TenNuoc)
+                .ToListAsync();
+
+            // Lấy danh sách hãng sản xuất 
+            var hangSanXuat = await _context.HangSanXuats
+                .AsNoTracking()
+                .Select(h => new
+                {
+
+                    MaHangSx = h.MaHangSx,
+                    TenHang = h.TenHang
+                })
+                .OrderBy(x => x.TenHang)
+                .ToListAsync();
+
+            // Lấy danh sách nhóm chi phí 
+            var nhomChiPhi = await _context.NhomChiPhis
+                .AsNoTracking()
+                .Select(n => new
+                {
+                    Id = n.Id,
+                    MaNhom = n.MaNhom,
+                    TenNhom = n.TenNhom
+                })
+                .OrderBy(x => x.TenNhom)
+                .ToListAsync();
+
+            // Lấy danh sách nhà thầu
+            var nhaThau = await _context.NhaThaus
+                .AsNoTracking()
+                .Select(n => new
+                {
+                    Id = n.Id,
+                    MaNhaThau = n.MaNhaThau,
+                    TenNhaThau = n.TenNhaThau
+                })
+                .OrderBy(x => x.TenNhaThau)
+                .ToListAsync();
+            // Lấy danh sách nguồn chi trả 
+            var nguonChiTra = await _context.NguonChiTras
+                .AsNoTracking()
+                .Select(n => new
+                {
+                    Id = n.Id,
+                    MaNguon = n.MaNguon,
+                    TenNguon = n.TenNguon
+                })
+                .OrderBy(x => x.TenNguon)
+                .ToListAsync();
+
+            ViewBag.DataJson = JsonSerializer.Serialize(data);
+            ViewBag.DonViTinhJson = JsonSerializer.Serialize(donViTinh);
+            ViewBag.DuongDungJson = JsonSerializer.Serialize(duongDung);
+            ViewBag.NuocSanXuatJson = JsonSerializer.Serialize(nuocSanXuat);
+            ViewBag.HangSanXuatJson = JsonSerializer.Serialize(hangSanXuat);
+            ViewBag.NhomChiPhiJson = JsonSerializer.Serialize(nhomChiPhi);
+            ViewBag.NhaThauJson = JsonSerializer.Serialize(nhaThau);
+            ViewBag.NguonChiTraJson = JsonSerializer.Serialize(nguonChiTra);
+            return View();
+        }
+        [HttpGet]
+        public async Task<IActionResult> KhoiPhuc()
+        {
+            var data = await _context.HangHoas
+           .Include(h => h.NhomHangHoa)
+           .Include(h => h.DuongDung)
+           .Include(h => h.NhaThau)
+           .AsNoTracking()
+           .Where(h => h.TrangThai == 0)
            .Select(h => new
            {
                Id = h.Id,
@@ -44,11 +226,11 @@ namespace QLHangHoa.Controllers
 
                // Row 4
                HamLuong = h.HamLuong,
-               HoatChat = h.HoatChatText, 
+               HoatChat = h.HoatChatText,
 
                // Row 5
                MaAnhXa = h.MaAnhXa,
-               MaBarCode = h.MaBarcode,      
+               MaBarCode = h.MaBarcode,
                MaPpCheBien = h.MaPpCheBien,
                NhomChiPhiId = h.NhomChiPhiId,
                NguonChiTraId = h.NguonChiTraId,
@@ -176,7 +358,7 @@ namespace QLHangHoa.Controllers
             ViewBag.NhomChiPhiJson = JsonSerializer.Serialize(nhomChiPhi);
             ViewBag.NhaThauJson = JsonSerializer.Serialize(nhaThau);
             ViewBag.NguonChiTraJson = JsonSerializer.Serialize(nguonChiTra);
-            return View();
+            return View("Index");
         }
         [HttpPost]
         public async Task<IActionResult> ThemHangHoa(HangHoa vm)
@@ -236,7 +418,7 @@ namespace QLHangHoa.Controllers
                 await _context.SaveChangesAsync();
 
                 TempData["Success"] = "Thêm hàng hóa thành công!";
-                return RedirectToAction("Index"); 
+                return RedirectToAction("Index");
             }
             catch (Exception ex)
             {
@@ -253,7 +435,7 @@ namespace QLHangHoa.Controllers
                 .Where(n => n.Id == nhomHangHoaId)
                 .Select(n => n.MaNhom)
                 .FirstOrDefaultAsync();
-           
+
 
             if (string.IsNullOrEmpty(maNhom))
             {
@@ -277,7 +459,7 @@ namespace QLHangHoa.Controllers
                     nextNumber = currentNumber + 1;
                 }
             }
-            return $"{nhomHangHoaId}.{nextNumber:D4}";
+            return $"{maNhom}.{nextNumber:D4}";
         }
         [HttpPost]
         public IActionResult XoaHangHoa(string MaHang)
@@ -291,16 +473,42 @@ namespace QLHangHoa.Controllers
                     return RedirectToAction("Index");
                 }
 
-                _context.HangHoas.Remove(hangHoa);
+                hangHoa.TrangThai = 0;
+                _context.HangHoas.Update(hangHoa);
                 _context.SaveChanges();
 
-                TempData["Success"] = "Xóa hàng hóa thành công!";
+                TempData["Success"] = "Xóa thành công.";
                 return RedirectToAction("Index");
             }
             catch (Exception ex)
             {
-                TempData["Error"] = "Đã xảy ra lỗi khi xóa: " + ex.Message;
-                return RedirectToAction("Index");
+                TempData["Error"] = "Đã xảy ra lỗi khi cập nhật: " + ex.Message;
+                return View("Index");
+            }
+        }
+        [HttpPost]
+        public IActionResult KhoiPhucHangHoa(string MaHang)
+        {
+            try
+            {
+                var hangHoa = _context.HangHoas.FirstOrDefault(h => h.MaHang == MaHang);
+                if (hangHoa == null)
+                {
+                    TempData["Error"] = "Hàng hóa không tồn tại.";
+                    return RedirectToAction("Index");
+                }
+
+                hangHoa.TrangThai = 1;
+                _context.HangHoas.Update(hangHoa);
+                _context.SaveChanges();
+
+                TempData["Success"] = "Khôi phục thành công.";
+                return RedirectToAction("KhoiPhuc");
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = "Đã xảy ra lỗi khi cập nhật: " + ex.Message;
+                return RedirectToAction("KhoiPhuc");
             }
         }
 
@@ -359,12 +567,11 @@ namespace QLHangHoa.Controllers
             catch (Exception ex)
             {
                 ModelState.AddModelError("", "Có lỗi xảy ra khi sửa hàng hóa: " + ex.Message);
-                TempData["Error"] = "Có lỗi xảy ra. Vui lòng thử lại.";
-                return View("index");
+                TempData["Error"] = "Có lỗi xảy ra. Vui lòng thử lại." + ex.Message;
+                return View("Index");
             }
         }
 
     }
 
 }
-

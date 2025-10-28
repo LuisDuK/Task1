@@ -122,9 +122,9 @@ body {
     color: white;
 }
 
-    .btn-primary:hover {
+.btn-primary:hover {
         background: #2563eb;
-    }
+ }
 
 .btn-menu {
     background: #22c55e;
@@ -132,17 +132,19 @@ body {
     padding: 10px 15px;
 }
 .table-wrap {
-    max-height: 75vh; 
+    max-height: 75vh;
     overflow-y: auto;
-    overflow-x: hidden; 
-    scrollbar-gutter: stable; 
+    overflow-x: auto;
+    scrollbar-gutter: stable;
 }
 .bang-thuoc {
-    width: 100%;
+    width: max-content;
+    min-width:100%;
     border-collapse: collapse;
     font-size: 14px;
     table-layout: fixed;
 }
+/*
 .bang-thuoc th:nth-child(1) {
     width: 16%;
 }
@@ -184,7 +186,7 @@ body {
 .bang-thuoc th:nth-child(10) {
     width: 7%;
 }
-
+*/
 thead {
     background: #DDDDDD;
     border-top: 1px solid #e5e7eb;
@@ -293,4 +295,55 @@ tbody tr:hover {
     color: #9ca3af;
 }
 
+.column-menu {
+    display: none;
+    position: absolute;
+    top: 100%;
+    right: 0;
+    margin-top: 5px;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    width: auto;
+    width: max-content;
+    max-height: 450px;
+    overflow-y: auto;
+    z-index: 1000;
+}
 
+.column-menu-body {
+    padding: 12px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+}
+.column-menu.active {
+    display: block;
+}
+.column-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 1px 5px;
+    cursor: pointer;
+    border-radius: 4px;
+    font-size: 13px;
+    user-select: none;
+    transition: background 0.2s;
+}
+
+    .column-checkbox:hover {
+        background: #CCCCCC ;
+    }
+
+    .column-checkbox input[type="checkbox"] {
+        width: 16px;
+        height: 16px;
+        cursor: pointer;
+        flex-shrink: 0;
+    }
+
+    .column-checkbox span {
+        flex: 1;
+    }

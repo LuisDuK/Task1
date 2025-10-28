@@ -5,6 +5,104 @@ let pageSize = 10;
 let filteredData = [...allData];
 let selectedNhom = "";
 
+
+
+// Hiển thị menu
+function toggleColumnMenu() {
+    const menu = document.getElementById('columnMenu');
+    menu.classList.toggle('active');
+}
+
+// Close menu when click outside
+document.addEventListener('click', function (e) {
+    const menu = document.getElementById('columnMenu');
+    const menuBtn = e.target.closest('.btn-menu');
+
+    if (!menu.contains(e.target) && !menuBtn) {
+        menu.classList.remove('active');
+    }
+});
+
+// Handle column visibility - GẮN SAU KHI DOM LOADED
+document.addEventListener('DOMContentLoaded', function () {
+    // Khởi tạo event listeners cho checkboxes
+    document.querySelectorAll('.column-checkbox input').forEach(checkbox => {
+        checkbox.addEventListener('change', function () {
+            const columnName = this.dataset.column;
+            const isChecked = this.checked;
+
+            toggleTableColumn(columnName, isChecked);
+            saveColumnSettings();
+        });
+    });
+
+    // Load settings đã lưu
+    loadColumnSettings();
+});
+
+// Hàm ẩn/hiện cột - DÙNG data-column thay vì index
+function toggleTableColumn(columnName, show) {
+    const table = document.querySelector('table');
+
+    // Tìm header theo data-column
+    const header = table.querySelector(`thead th[data-column="${columnName}"]`);
+    if (!header) {
+        console.warn(`Không tìm thấy header với data-column="${columnName}"`);
+        return;
+    }
+
+    // Lấy index của header
+    const headers = Array.from(table.querySelectorAll('thead th'));
+    const headerIndex = headers.indexOf(header);
+
+    if (headerIndex === -1) return;
+
+    // Ẩn/hiện header
+    header.style.display = show ? '' : 'none';
+
+    // Ẩn/hiện cells trong body
+    const rows = table.querySelectorAll('tbody tr');
+    rows.forEach(row => {
+        const cell = row.querySelectorAll('td')[headerIndex];
+        if (cell) {
+            cell.style.display = show ? '' : 'none';
+        }
+    });
+}
+
+// Lưu settings
+function saveColumnSettings() {
+    const settings = {};
+    document.querySelectorAll('.column-checkbox input').forEach(checkbox => {
+        settings[checkbox.dataset.column] = checkbox.checked;
+    });
+    localStorage.setItem('columnSettings', JSON.stringify(settings));
+}
+
+// Load settings
+function loadColumnSettings() {
+    const saved = localStorage.getItem('columnSettings');
+    if (!saved) return;
+
+    try {
+        const settings = JSON.parse(saved);
+        Object.keys(settings).forEach(columnName => {
+            const checkbox = document.querySelector(`input[data-column="${columnName}"]`);
+            if (checkbox) {
+                checkbox.checked = settings[columnName];
+                toggleTableColumn(columnName, settings[columnName]);
+            }
+        });
+    } catch (e) {
+        console.error('Error loading column settings:', e);
+    }
+}
+
+// Khởi tạo khi page load
+document.addEventListener('DOMContentLoaded', function () {
+    loadColumnSettings();
+});
+
 initNhomDropdown();
 renderTable();
 // Khởi tạo dropdown nhóm hàng hóa
@@ -29,43 +127,74 @@ function renderTable() {
     const tbody = document.getElementById('tableBody');
     tbody.innerHTML = '';
 
-    // Tính toán dữ liệu cho trang hiện tại
     const startIndex = (currentPage - 1) * pageSize;
     const endIndex = Math.min(startIndex + pageSize, filteredData.length);
     const pageData = filteredData.slice(startIndex, endIndex);
 
-    // Render từng dòng
+    const currentPath = window.location.pathname.toLowerCase();
+
     pageData.forEach(item => {
         const row = document.createElement('tr');
+
+        let actionHtml = '';
+        if (currentPath.includes('/khoiphuc')) {
+            actionHtml = `
+                <div class="action-icons">
+                    <button class="icon-btn" onclick="openActionModal('${item.MaHang}', 'restore')">
+                        <i class="fas fa-undo"></i> 
+                    </button>
+                </div>`;
+        } else {
+            actionHtml = `
+                <div class="action-icons">
+                    <button class="icon-btn" onclick="editItem('${item.MaHang}')">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="icon-btn" onclick="openActionModal('${item.MaHang}', 'delete')">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>`;
+        }
+       
+        // Render 
         row.innerHTML = `
-                            <td>${item.TenNhom ?? ''}</td>
-                            <td>${item.TenHang ?? ''}</td>
-                            <td style="text-align: center">${item.MaHang ?? ''}</td>
-                            <td style="text-align: center">${item.MaDuong ?? ''}</td>
-                            <td>${item.HamLuong ?? ''}</td>
-                            <td>${item.HoatChat ?? ''}</td>
-                            <td>${item.MaAnhXa ?? ''}</td>
-                            <td>${item.Bhyt ? 'Có' : 'Không'}</td>
-                            <td>${item.ThongTinThuoc ?? ''}</td>
-                            <td>
-                                <div class="action-icons">
-                                    <button class="icon-btn" onclick="editItem('${item.MaHang}')">
-                                        <i class="fas fa-edit"></i>
-                                    </button>
-                                    <button class="icon-btn" onclick="deleteItem('${item.MaHang}')">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </div>
-                            </td>
-                        `;
+            <td>${item.TenNhom ?? ''}</td>
+            <td>${item.TenHang ?? ''}</td>
+            <td>${item.MaHang ?? ''}</td>
+            <td style="display: none;">${item.DonViTinhNhap ?? ''}</td>
+            <td style="display: none;">${item.DonViTinhXuat ?? ''}</td>
+            <td style="display: none;">${item.SoLuongQuyDoi ?? ''}</td>
+            <td>${item.MaDuong ?? ''}</td>
+            <td style="display: none;">${item.DuongDung ?? ''}</td>
+            <td style="display: none;">${item.NuocSanXuat ?? ''}</td>
+            <td style="display: none;">${item.HangSanXuat ?? ''}</td>
+            <td>${item.HamLuong ?? ''}</td>
+            <td>${item.HoatChat ?? ''}</td>
+            <td>${item.MaAnhXa ?? ''}</td>
+            <td style="display: none;">${item.MaPpCheBien ?? ''}</td>
+            <td style="display: none;">${item.SlMin ?? ''}</td>
+            <td style="display: none;">${item.SlMax ?? ''}</td>
+            <td style="display: none;">${item.SoNgayDung ?? ''}</td>
+            <td style="display: none;">${item.MaNhomChiPhi ?? ''}</td>
+            <td style="display: none;">${item.NguonChiTra ?? ''}</td>
+            <td style="display: none;">${item.DangBaoChe ?? ''}</td>
+            <td>${item.Bhyt ? 'Có' : 'Không'}</td>
+            <td style="display: none;">${item.MaBarCode ?? ''}</td>
+            <td style="display: none;">${item.SoDangKy ?? ''}</td>
+            <td style="display: none;">${item.QuyCachDongGoi ?? ''}</td>
+            <td>${item.ThongTinThau ?? ''}</td>
+            <td style="display: none;">${item.NhaThau ?? ''}</td>
+            <td style="display: none;">${item.GiaThau ?? ''}</td>
+            <td style="display: none;">${item.TiLeBHYT ?? ''}</td>
+            <td style="display: none;">${item.TiLeThanhToan ?? ''}</td>
+            <td>${actionHtml}</td>
+        `;
+
         tbody.appendChild(row);
     });
 
-    // Cập nhật thông tin phân trang
-
     renderPaginationButtons();
 }
-
 
 
 // Hàm áp dụng tất cả bộ lọc
@@ -201,43 +330,52 @@ function changePageSize() {
 }
 
 // Hàm xóa
-let maHangCanXoa = null;
+let maHangHienTai = null;
+let hanhDongHienTai = null; // 'delete' hoặc 'restore'
 
-function deleteItem(maHang) {
-    maHangCanXoa = maHang;
-    document.getElementById('deleteMaHang').value = maHangCanXoa;
-    document.getElementById('deleteOverlay').style.display = 'flex';
+// Hiển thị modal xác nhận
+function openActionModal(maHang, actionType) {
+    maHangHienTai = maHang;
+    hanhDongHienTai = actionType;
+
+    const overlay = document.getElementById('actionOverlay');
+    const form = document.getElementById('actionForm');
+    const title = document.getElementById('modalTitle');
+    const message = document.getElementById('modalMessage');
+    const btn = document.getElementById('actionSubmitBtn');
+    overlay.style.display = 'flex';
+    console.log(overlay);
+
+    document.getElementById('actionMaHang').value = maHang;
+
+    if (actionType === 'delete') {
+        title.textContent = 'Xác nhận xóa';
+        message.textContent = 'Bạn có chắc chắn muốn xóa hàng hóa này không?';
+        form.action = '/HangHoa/XoaHangHoa';
+        btn.textContent = 'Xóa';
+        btn.className = 'btn btn-danger';
+    } else if (actionType === 'restore') {
+        title.textContent = 'Khôi phục hàng hóa';
+        message.textContent = 'Bạn có chắc chắn muốn khôi phục hàng hóa này không?';
+        form.action = '/HangHoa/KhoiPhucHangHoa';
+        btn.textContent = 'Khôi phục';
+        btn.className = 'btn btn-primary';
+    }
+
+    overlay.style.display = 'flex';
 }
 
-function closeDeleteModal() {
-    document.getElementById('deleteOverlay').style.display = 'none';
-    maHangCanXoa = null;
+// Đóng modal
+function closeActionModal() {
+    document.getElementById('actionOverlay').style.display = 'none';
+    maHangHienTai = null;
+    hanhDongHienTai = null;
 }
-/*
-function confirmDelete() {
-    $.ajax({
-        url: '/HangHoa/XoaHangHoa',
-        type: 'POST',
-        data: { maHangHoa: maHangCanXoa },
-        success: function (res) {
-            closeDeleteModal();
-            if (res.success) {
-                document.querySelector(`[data-ma="${maHangCanXoa}"]`)?.closest('tr')?.remove();
-                alert(res.message);
 
-            } else {
-                //console.log(res);
-                alert(res.message);
-            }
-        },
-        error: function () {
-            alert('Có lỗi xảy ra khi kết nối đến server.');
-        }
-    });
-} */
-document.getElementById('deleteOverlay').addEventListener('click', function (e) {
+// Cho phép click ngoài modal để đóng
+document.getElementById('actionOverlay').addEventListener('click', function (e) {
     if (e.target === this) {
-        closeDeleteModal();
+        closeActionModal();
     }
 });
 ///
@@ -333,7 +471,7 @@ function initModalDropdowns() {
     const selectNhaThau = document.querySelector('select[name="MaNhaThau"]');
     nhaThau.forEach(item => {
         const option = document.createElement('option');
-        option.value = item.MaNhaThau;
+        option.value = item.Id;
         option.textContent = item.TenNhaThau;
         selectNhaThau.appendChild(option);
     });
@@ -379,8 +517,6 @@ function editItem(maHang) {
     const setSel = setVal;
     const setChk = (name, bool) => { const el = byName(name); if (el) el.checked = !!bool; };
 
-
-    // nếu item có Id, điền vào hidden để backend biết đang update
     if (typeof item.Id !== 'undefined') document.getElementById('Id').value = item.Id;
 
     setVal('MaHang', item.MaHang);
@@ -389,15 +525,9 @@ function editItem(maHang) {
     setSel('DvtNhapId', item.DvtNhapId);
     setSel('DvtXuatId', item.DvtXuatId);
     setVal('SoLuongQuyDoi', item.SoLuongQuyDoi);
-
-    // các tên bạn đang render trên bảng KHÁC tên model → map lại:
-    setVal('MaDuongDung', item.MaDuong ?? item.MaDuongDung ?? '');
-
-    const selectD = document.querySelector('select[name="DuongDungId"]');
-    const inputD = document.querySelector('input[name="MaDuongDung"]');
-    if (!inputD.value) {
-        inputD.value = selectD.value;
-    }
+    
+    setVal('MaDuongDung', item.MaDuong);
+    setSel('DuongDungId', item.MaDuong);
 
     setSel('NuocId', item.NuocId);
     setSel('HangSxId', item.HangSxId);
@@ -410,7 +540,7 @@ function editItem(maHang) {
     setVal('SoDangKy', item.SoDangKy);
 
     setVal('MaAnhXa', item.MaAnhXa);
-    setVal('MaBarcode', item.MaBarcode ?? item.MaBarCode ?? ''); // HTML đang là MaBarCode -> sửa name/id thành MaBarcode
+    setVal('MaBarcode', item.MaBarcode ?? item.MaBarCode ?? '');
 
     setVal('MaPpCheBien', item.MaPpCheBien);
     setSel('NhomChiPhiId', item.NhomChiPhiId);
@@ -421,7 +551,7 @@ function editItem(maHang) {
     setVal('TiLeThanhToan', item.TiLeThanhToan);
 
     setVal('ThongTinThau', item.ThongTinThuoc ?? item.ThongTinThau ?? '');
-    setSel('MaNhaThau', item.MaNhaThau);
+    setSel('MaNhaThau', item.IdNhaThau);
 
     setVal('GiaThau', item.GiaThau);
     setVal('SlMin', item.SlMin);

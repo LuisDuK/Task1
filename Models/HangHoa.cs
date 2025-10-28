@@ -62,6 +62,7 @@ public partial class HangHoa
     public decimal? SlMax { get; set; }
 
     public int SoNgayDung { get; set; }
+    public byte TrangThai { get; set; }
 
     public virtual DuongDung? DuongDung { get; set; }
 

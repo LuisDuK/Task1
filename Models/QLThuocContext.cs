@@ -148,6 +148,10 @@ public partial class QLThuocContext : DbContext
             entity.Property(e => e.TiLeThanhToan)
                 .HasColumnType("decimal(5, 2)")
                 .HasColumnName("ti_le_thanh_toan");
+            entity.Property(e => e.TrangThai)
+     .HasColumnType("tinyint")
+     .HasColumnName("trang_thai")
+     .HasDefaultValue((byte)1);
 
             entity.HasOne(d => d.DuongDung).WithMany(p => p.HangHoas)
                 .HasForeignKey(d => d.MaDuongDung)

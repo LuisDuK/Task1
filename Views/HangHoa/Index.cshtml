@@ -1,354 +1,320 @@
-﻿@{
-    Layout = null;
+﻿﻿@{
+    ViewData["Title"] = "Quản lý hàng hóa";
 }
 @using System.Text.Json
-<!DOCTYPE html>
-<html lang="vi">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quản lý Hàng hóa</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 
-    <link rel="stylesheet" href="~/css/hanghoa.css" />
-    <link rel="stylesheet" href="~/css/modal.css" />
-</head>
-<body>
-    <div class="container">
-        <div class="header">
-            <div class="search-box">
-                <input type="text" id="searchInput" class="search-input" placeholder="Tìm kiếm thông tin">
-                <button class="search-btn"><i class="fas fa-chevron-down"></i></button>
-                <button class="search-btn" style="margin-left:10px;" onclick="searchData()"><i class="fas fa-search"></i></button>
-            </div>
-            
-            <div class="dropdown-box">
-                <select id="filterNhom" class="form-select-filter" onchange="filterByNhom()">
-                    <option value="" >-- Theo nhóm hàng hóa --</option>
-                </select>
-            </div>
+<div class="table-wrap">
+    <table class="bang-thuoc">
+        <thead>
+            <tr>
+                <th data-column="MaNhom">Nhóm hàng hóa</th>
+                <th data-column="TenHang">Tên hàng hóa</th>
+                <th data-column="MaHang">Mã hàng hóa</th>
+                <th data-column="DonViTinhNhap" style="display: none;">Đơn vị tính nhập</th>
+                <th data-column="DonViTinhXuat" style="display: none;">Đơn vị tính xuất</th>
+                <th data-column="SoLuongQuyDoi" style="display: none;">Số lượng quy đổi</th>
+                <th data-column="MaDuong">Mã đường dùng</th>
+                <th data-column="DuongDung" style="display: none;">Đường dùng</th>
+                <th data-column="NuocSanXuat" style="display: none;">Nước sản xuất</th>
+                <th data-column="HangSanXuat" style="display: none;">Hãng sản xuất</th>
+                <th data-column="HamLuong">Hàm lượng</th>
+                <th data-column="HoatChat">Hoạt chất</th>
+                <th data-column="MaAnhXa">Mã ánh xạ</th>
+                <th data-column="MaPPCheBien" style="display: none;">Mã PP chế biến</th>
+                <th data-column="SoLuongMin" style="display: none;">SL min</th>
+                <th data-column="SoLuongMax" style="display: none;">SL max</th>
+                <th data-column="SoNgayDung" style="display: none;">Số ngày dùng</th>
+                <th data-column="MaNhomChiPhi" style="display: none;">Nhóm chi phí</th>
+                <th data-column="NguonChiTra" style="display: none;">Nguồn chi trả</th>
+                <th data-column="DangBaoChe" style="display: none;">Dạng bào chế</th>
+                <th data-column="Bhyt">BHYT</th>
+                <th data-column="MaBarcode" style="display: none;">Mã barcode</th>
+                <th data-column="SoDangKy" style="display: none;">Số đăng ký</th>
+                <th data-column="QuyCachDongGoi" style="display: none;">Quy cách đóng gói</th>
+                <th data-column="ThongTinThau">Thông tin thầu</th>
+                <th data-column="NhaThau" style="display: none;">Nhà thầu</th>
+                <th data-column="GiaThau" style="display: none;">Giá thầu</th>
+                <th data-column="TiLeBHYT" style="display: none;">Tỷ lệ BHYT</th>
+                <th data-column="TiLeThanhToan" style="display: none;">Tỷ lệ thanh toán</th>
+                <th>Tùy chọn</th>
+            </tr>
+        </thead>
+        <tbody id="tableBody">
+        </tbody>
+    </table>
+</div>
+<div class="pagination">
+    <div class="page-size">
+        <select id="pageSize" onchange="changePageSize()">
+            <option value="10" selected>10</option>
+            <option value="20">20</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
+        </select>
 
-            <div class="header-actions">
-                <button class="btn btn-success">
-                    <i class="fa-solid fa-file-export"></i>
-                    Nhập Excel
-                </button>
-
-                <button class="btn btn-success">
-                    <i class="fa-solid fa-file-export"></i>
-                    Xuất Excel
-                </button>
-
-                <button class="btn btn-primary" onclick="onAddNewClick()">
-                    <i class="fas fa-plus"></i>
-                    Thêm mới
-                </button>
-
-                <button class="btn btn-menu">
-                    <i class="fas fa-bars"></i>
-                </button>
-            </div>
+    </div>
+    <div class="page-numbers" id="pageNumbers">
+        <!-- Page buttons will be generated here -->
+    </div>
+</div>
+<div class="modal-overlay" id="actionOverlay">
+    <div class="modal" style="max-width: 400px;">
+        <div class="modal-header">
+            <h2 class="modal-title" id="modalTitle">Xác nhận</h2>
+            <button class="close-btn" onclick="closeActionModal()">&times;</button>
         </div>
-        <div class="table-wrap">
-            <table class="bang-thuoc">
-                <thead>
-                    <tr>
-                        <th>Nhóm hàng hóa</th>
-                        <th>Tên hàng hóa</th>
-                        <th>Mã hàng hóa</th>
-                        <th>Mã đường dùng</th>
-                        <th>Hàm lượng</th>
-                        <th>Hoạt chất</th>
-                        <th>Mã ánh xạ</th>
-                        <th>BHYT</th>
-                        <th>Thông tin thầu</th>
-                        <th>Tùy chọn</th>
-                    </tr>
-                </thead>
-                <tbody id="tableBody">
-                
-                </tbody>
-            </table>
+        <form id="actionForm" method="post">
+            <div class="modal-body">
+                <p id="modalMessage">Bạn có chắc chắn muốn thực hiện hành động này không?</p>
+                <input type="hidden" name="MaHang" id="actionMaHang" />
+            </div>
+            <div class="modal-footer">
+                <button type="submit" id="actionSubmitBtn" class="btn btn-danger">Xác nhận</button>
+                <button type="button" class="btn btn-secondary" onclick="closeActionModal()">Hủy</button>
+            </div>
+        </form>
+    </div>
+</div>
+<div class="modal-overlay" id="notifyOverlay" style="display:none">
+    <div class="modal" style="max-width:400px;">
+        <div class="modal-header">
+            <h2 class="modal-title" id="notifyTitle">Thông báo</h2>
+            <button class="close-btn" onclick="closeNotifyModal()">&times;</button>
         </div>
-        <div class="pagination">
-            <div class="page-size">
-                <select id="pageSize" onchange="changePageSize()">
-                    <option value="10" selected>10</option>
-                    <option value="20" >20</option>
-                    <option value="50">50</option>
-                    <option value="100">100</option>
-                </select>
-             
-            </div>
-            <div class="page-numbers" id="pageNumbers">
-                <!-- Page buttons will be generated here -->
-            </div>
+        <div class="modal-body">
+            <p id="notifyMessage">...</p>
         </div>
-        <div class="modal-overlay" id="modalOverlay">
-            <div class="modal">
-                <div class="modal-header">
-                    <h2 class="modal-title" id="modalTitle">Thêm hàng hóa</h2>
-                    <button class="close-btn" onclick="closeModal()">&times;</button>
-                </div>
-
-                <div class="modal-body"> 
-                    <form id="productForm" asp-action="themhanghoa" method="post">
-                        <input type="hidden" id="Id" name="Id">
-                        <!-- Row 1 -->
-                        <div class="form-row two-col">
-                            <div  style="display: flex; gap: 16px;">
-                                <div class="form-group" style="flex: 7;">
-                                    <label class="form-label">Nhóm hàng hóa <span class="required">*</span></label>
-                                    <select class="form-select input-required" name="MaNhom" required>
-                                        <option value="">-- Nhóm hàng hóa --</option>
-                            
-                                    </select>
-                                </div>
-
-                                <div class="form-group" style="flex: 3;">
-                                    <label class="form-label">Mã hàng hóa <span class="required">*</span></label>
-                                    <input type="text" class="form-input input-required" name="MaHang" placeholder="Auto" value="Auto" readonly>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Tên hàng hóa <span class="required">*</span></label>
-                                <input type="text" class="form-input input-required" name="TenHang" placeholder="Nhập tên hàng hóa" required>
-                            </div>
-                        </div>
-
-                        <!-- Row 2 -->
-                        <div class="form-row five-col">
-                            <div class="form-group">
-                                <label class="form-label">Đơn vị tính nhập <span class="required">*</span></label>
-                                <select class="form-select input-required" name="DvtNhapId" required>
-                                    <option value="">-- Đơn vị tính nhập --</option>
-                                </select>
-                            </div>
-
-                            <div class="form-group">
-                                <label class="form-label">Đơn vị tính xuất <span class="required">*</span></label>
-                                <select class="form-select input-required" name="DvtXuatId" required>
-                                    <option value="">-- Đơn vị tính xuất --</option>
-                                </select>
-                            </div>
-
-                            <div class="form-group">
-                                <label class="form-label">Số lượng quy đổi <span class="required">*</span></label>
-                                <input type="number" class="form-input input-required" name="SoLuongQuyDoi" placeholder="Nhập số lượng quy đổi" required>
-                            </div>
-                        
-                            <div class="form-group">
-                                <label class="form-label">Mã đường dùng</label>
-                                <input type="text" class="form-input" name="MaDuongDung" placeholder="Nhập mã đường dùng" readonly>
-                            </div>
-
-                            <div class="form-group" >
-                                <label class="form-label">Đường dùng</label>
-                                <select class="form-select" name="DuongDungId">
-                                    <option value="">-- Đường dùng --</option>
-                                </select>
-                            </div>
-                        </div>
-                        <!-- Row 3 -->
-                        <div class="form-row three-col">
-                            <div class="form-group">
-                                <label class="form-label">Nước sản xuất</label>
-                                <select class="form-select" name="NuocId">
-                                    <option value="">-- Nước sản xuất --</option>
-                                </select>
-                            </div>
-
-                            <div class="form-group">
-                                <label class="form-label">Hãng sản xuất</label>
-                                <select class="form-select" name="HangSxId">
-                                    <option value="">-- Hãng sản xuất --</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <!-- Row 4 -->
-                        <div class="form-row two-col">
-                            <div class="form-group">
-                                <label class="form-label">Hàm lượng</label>
-                                <input type="text" class="form-input" name="HamLuong" placeholder="Nhập hàm lượng">
-                            </div>
-
-                            <div class="form-group">
-                                <label class="form-label">Hoạt chất</label>
-                                <input type="text" class="form-input" name="HoatChatText" placeholder="Nhập hoạt chất">
-                            </div>
-                        </div>
-
-                        <!-- Row 5 -->
-                        <div class="form-row five-col">
-                            <div class="form-group">
-                                <label class="form-label">Mã ánh xạ <span class="required">*</span></label>
-                                <input type="text" class="form-input input-required" name="MaAnhXa" placeholder="Nhập Mã ánh xạ, mã BHYT" required>
-                            </div>
-
-                            <div class="form-group">
-                                <label class="form-label">Mã bar code</label>
-                                <input type="text" class="form-input" name="MaBarCode" placeholder="Nhập mã bar code">
-                            </div>
-
-                            <div class="form-group">
-                                <label class="form-label">Mã PP chế biến</label>
-                                <input type="text" class="form-input" name="MaPpCheBien" placeholder="Nhập mã phương pháp chế biến">
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Mã nhóm chi phí <span class="required">*</span></label>
-                                <select class="form-select input-required" name="NhomChiPhiId" required>
-                                    <option value="">-- Nhóm chi phí --</option>
-                                </select>
-                            </div>
-
-                            <div class="form-group">
-                                <label class="form-label">Nguồn chi trả <span class="required">*</span></label>
-                                <select class="form-select input-required" name="NguonChiTraId" required>
-                                    <option value="">-- Nguồn chi trả --</option>
-                                </select>
-                            </div>
-                        </div>
-                        <!-- Row 6 -->
-                        <div class="form-row four-col">
-                            <div class="form-group">
-                                <label class="form-label">Dạng bào chế</label>
-                                <input type="text" class="form-input" name="DangBaoChe" placeholder="Nhập dạng bào chế">
-                            </div>
-
-                            <div class="form-group">
-                                <label class="form-label">Quy cách đóng gói</label>
-                                <input type="text" class="form-input" name="QuyCachDongGoi" placeholder="Nhập quy cách đóng gói">
-                            </div>
-                        </div>
-
-                        <!-- Row 7 -->
-                        <div class="form-row two-col">
-                            <div class="form-row two-col">
-                                <div class="form-group">
-                                    <label class="form-label">Số đăng ký</label>
-                                    <input type="text" class="form-input" name="SoDangKy" placeholder="Nhập số đăng ký">
-                                </div>
-
-                                <div class="form-group">
-                                    <label class="form-label">Thông tin thầu</label>
-                                    <input type="text" class="form-input" name="ThongTinThau" placeholder="Nhập thông tin thầu">
-                                </div>
-                            </div>
-                            <div style="display: flex; gap: 16px;">
-                                <div class="form-group" style="flex: 7; ">
-                                    <label class="form-label">Nhà thầu</label>
-                                    <select class="form-select" name="MaNhaThau">
-                                        <option value="">-- Nhà thầu --</option>
-                                    </select>
-                                </div>
-                                <div class="form-group" style="flex: 3;">
-                                    <label class="form-label">Giá thầu</label>
-                                    <input type="number" class="form-input" name="GiaThau" placeholder="Nhập giá thầu">
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Row 8 -->
-                        <div class="form-row six-col">
-                           
-                            <div class="form-group">
-                                <label class="form-label">Tỉ lệ BHYT</label>
-                                <input type="text" class="form-input" name="TiLeBHYT" placeholder="Nhập tỉ lệ bhyt">
-                            </div>
-
-                            <div class="form-group">
-                                <label class="form-label">Tỉ lệ th.toán</label>
-                                <input type="text" class="form-input" name="TiLeThanhToan" placeholder="Nhập tỉ lệ thanh toán">
-                            </div>
-
-                            <div class="form-group">
-                                <label class="form-label">SL min</label>
-                                <input type="number" class="form-input" name="SlMin" placeholder="SL min">
-                            </div>
-
-                            <div class="form-group">
-                                <label class="form-label">SL max</label>
-                                <input type="number" class="form-input" name="SlMax" placeholder="SL max">
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Số ngày dùng thuốc</label>
-                                <input type="number" class="form-input" name="SoNgayDung" value="90">
-                            </div>
-
-                            <div class="checkbox-group">
-                                <input type="checkbox" id="bhyt" name="Bhyt" value="True" class="checkbox-input">
-                                <label for="bhyt" class="checkbox-label">BHYT</label>
-                            </div>
-                        </div> <div class="modal-footer">
-                            <button type="submit" class="btn btn-primary" >Lưu</button>
-                           
-                        
-                    </form>
-                    <button type="button" class="btn btn-secondary" onclick="closeModal()">Đóng</button>
-                </div>
-                </div>
-
-               
-                
-            </div>
+        <div class="modal-footer">
+            <button class="btn btn-primary" onclick="closeNotifyModal()">Đóng</button>
+        </div>
+    </div>
+</div>
+<div class="modal-overlay" id="modalOverlay">
+    <div class="modal">
+        <div class="modal-header">
+            <h2 class="modal-title" id="modalTitle">Thêm hàng hóa</h2>
+            <button class="close-btn" onclick="closeModal()">&times;</button>
         </div>
 
-        <div class="modal-overlay" id="deleteOverlay">
-            <div class="modal" style="max-width: 400px;">
-                <div class="modal-header">
-                    <h2 class="modal-title">Xác nhận xóa</h2>
-                    <button class="close-btn" onclick="closeDeleteModal()">&times;</button>
+        <div class="modal-body">
+            <form id="productForm" asp-action="themhanghoa" method="post">
+                <input type="hidden" id="Id" name="Id">
+                <!-- Row 1 -->
+                <div class="form-row two-col">
+                    <div style="display: flex; gap: 16px;">
+                        <div class="form-group" style="flex: 7;">
+                            <label class="form-label">Nhóm hàng hóa <span class="required">*</span></label>
+                            <select class="form-select input-required" name="MaNhom" required>
+                                <option value="">-- Nhóm hàng hóa --</option>
+
+                            </select>
+                        </div>
+
+                        <div class="form-group" style="flex: 3;">
+                            <label class="form-label">Mã hàng hóa <span class="required">*</span></label>
+                            <input type="text" class="form-input input-required" name="MaHang" placeholder="Auto" value="Auto" readonly>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Tên hàng hóa <span class="required">*</span></label>
+                        <input type="text" class="form-input input-required" name="TenHang" placeholder="Nhập tên hàng hóa" required>
+                    </div>
                 </div>
-                 <form id="deleteForm" asp-controller="HangHoa" asp-action="xoahanghoa" method="post">
-                <div class="modal-body">
-                    <p>Bạn có chắc chắn muốn xóa hàng hóa này không?</p>
-                    <input type="hidden" name="MaHang" id="deleteMaHang" />
+
+                <!-- Row 2 -->
+                <div class="form-row five-col">
+                    <div class="form-group">
+                        <label class="form-label">Đơn vị tính nhập <span class="required">*</span></label>
+                        <select class="form-select input-required" name="DvtNhapId" required>
+                            <option value="">-- Đơn vị tính nhập --</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Đơn vị tính xuất <span class="required">*</span></label>
+                        <select class="form-select input-required" name="DvtXuatId" required>
+                            <option value="">-- Đơn vị tính xuất --</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Số lượng quy đổi <span class="required">*</span></label>
+                        <input type="number" class="form-input input-required" name="SoLuongQuyDoi" placeholder="Nhập số lượng quy đổi" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Mã đường dùng</label>
+                        <input type="text" class="form-input" name="MaDuongDung" placeholder="Nhập mã đường dùng" readonly>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Đường dùng</label>
+                        <select class="form-select" name="DuongDungId">
+                            <option value="">-- Đường dùng --</option>
+                        </select>
+                    </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="submit" class="btn btn-danger" onclick="confirmDelete()">Xóa</button>
-                    <button type="button" class="btn btn-secondary" onclick="closeDeleteModal()">Hủy</button>
+                <!-- Row 3 -->
+                <div class="form-row three-col">
+                    <div class="form-group">
+                        <label class="form-label">Nước sản xuất</label>
+                        <select class="form-select" name="NuocId">
+                            <option value="">-- Nước sản xuất --</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Hãng sản xuất</label>
+                        <select class="form-select" name="HangSxId">
+                            <option value="">-- Hãng sản xuất --</option>
+                        </select>
+                    </div>
                 </div>
+
+                <!-- Row 4 -->
+                <div class="form-row two-col">
+                    <div class="form-group">
+                        <label class="form-label">Hàm lượng</label>
+                        <input type="text" class="form-input" name="HamLuong" placeholder="Nhập hàm lượng">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Hoạt chất</label>
+                        <input type="text" class="form-input" name="HoatChatText" placeholder="Nhập hoạt chất">
+                    </div>
+                </div>
+
+                <!-- Row 5 -->
+                <div class="form-row five-col">
+                    <div class="form-group">
+                        <label class="form-label">Mã ánh xạ <span class="required">*</span></label>
+                        <input type="text" class="form-input input-required" name="MaAnhXa" placeholder="Nhập Mã ánh xạ, mã BHYT" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Mã bar code</label>
+                        <input type="text" class="form-input" name="MaBarCode" placeholder="Nhập mã bar code">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Mã PP chế biến</label>
+                        <input type="text" class="form-input" name="MaPpCheBien" placeholder="Nhập mã phương pháp chế biến">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Mã nhóm chi phí <span class="required">*</span></label>
+                        <select class="form-select input-required" name="NhomChiPhiId" required>
+                            <option value="">-- Nhóm chi phí --</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Nguồn chi trả <span class="required">*</span></label>
+                        <select class="form-select input-required" name="NguonChiTraId" required>
+                            <option value="">-- Nguồn chi trả --</option>
+                        </select>
+                    </div>
+                </div>
+                <!-- Row 6 -->
+                <div class="form-row four-col">
+                    <div class="form-group">
+                        <label class="form-label">Dạng bào chế</label>
+                        <input type="text" class="form-input" name="DangBaoChe" placeholder="Nhập dạng bào chế">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Quy cách đóng gói</label>
+                        <input type="text" class="form-input" name="QuyCachDongGoi" placeholder="Nhập quy cách đóng gói">
+                    </div>
+                </div>
+
+                <!-- Row 7 -->
+                <div class="form-row two-col">
+                    <div class="form-row two-col">
+                        <div class="form-group">
+                            <label class="form-label">Số đăng ký</label>
+                            <input type="text" class="form-input" name="SoDangKy" placeholder="Nhập số đăng ký">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Thông tin thầu</label>
+                            <input type="text" class="form-input" name="ThongTinThau" placeholder="Nhập thông tin thầu">
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 16px;">
+                        <div class="form-group" style="flex: 7; ">
+                            <label class="form-label">Nhà thầu</label>
+                            <select class="form-select" name="MaNhaThau">
+                                <option value="">-- Nhà thầu --</option>
+                            </select>
+                        </div>
+                        <div class="form-group" style="flex: 3;">
+                            <label class="form-label">Giá thầu</label>
+                            <input type="number" class="form-input" name="GiaThau" placeholder="Nhập giá thầu">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Row 8 -->
+                <div class="form-row six-col">
+
+                    <div class="form-group">
+                        <label class="form-label">Tỉ lệ BHYT</label>
+                        <input type="text" class="form-input" name="TiLeBHYT" placeholder="Nhập tỉ lệ bhyt">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Tỉ lệ th.toán</label>
+                        <input type="text" class="form-input" name="TiLeThanhToan" placeholder="Nhập tỉ lệ thanh toán">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">SL min</label>
+                        <input type="number" class="form-input" name="SlMin" placeholder="SL min">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">SL max</label>
+                        <input type="number" class="form-input" name="SlMax" placeholder="SL max">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Số ngày dùng thuốc</label>
+                        <input type="number" class="form-input" name="SoNgayDung" value="90">
+                    </div>
+
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="bhyt" name="Bhyt" value="True" class="checkbox-input">
+                        <label for="bhyt" class="checkbox-label">BHYT</label>
+                    </div>
+                </div> <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Lưu</button>
             </form>
-            </div>
+            <button type="button" class="btn btn-secondary" onclick="closeModal()">Đóng</button>
         </div>
-        <div class="modal-overlay" id="notifyOverlay" style="display:none">
-            <div class="modal" style="max-width:400px;">
-                <div class="modal-header">
-                    <h2 class="modal-title" id="notifyTitle">Thông báo</h2>
-                    <button class="close-btn" onclick="closeNotifyModal()">&times;</button>
-                </div>
-                <div class="modal-body">
-                    <p id="notifyMessage">...</p>
-                </div>
-                <div class="modal-footer">
-                    <button class="btn btn-primary" onclick="closeNotifyModal()">Đóng</button>
-                </div>
-            </div>
     </div>
+</div>
 
-    </div>
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-    <script>
-        const allData = @Html.Raw(ViewBag.DataJson ?? "[]");
-        const nhomHangHoa = @Html.Raw(ViewBag.NhomHangHoaJson ?? "[]");
-        const donViTinh = @Html.Raw(ViewBag.DonViTinhJson ?? "[]");
-        const duongDung = @Html.Raw(ViewBag.DuongDungJson ?? "[]");
-        const nuocSanXuat = @Html.Raw(ViewBag.NuocSanXuatJson ?? "[]");
-        const hangSanXuat = @Html.Raw(ViewBag.HangSanXuatJson ?? "[]");
-        const nhomChiPhi = @Html.Raw(ViewBag.NhomChiPhiJson ?? "[]");
-        const nhaThau = @Html.Raw(ViewBag.NhaThauJson ?? "[]");
-        const nguonChiTra = @Html.Raw(ViewBag.NguonChiTraJson ?? "[]");
 
-        document.addEventListener("DOMContentLoaded", function () {
-            
-            var success = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(TempData["Success"]));
-            var error = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(TempData["Error"]));
 
-            if (success) { showSuccess(success); }
-            if (error) { showError(error); }
-        });
-    </script>
-    <script src="~/js/hanghoa.js"></script>
-</body>
-</html>
+
+
+<script>
+    const allData = @Html.Raw(ViewBag.DataJson ?? "[]");
+    const nhomHangHoa = @Html.Raw(ViewBag.NhomHangHoaJson ?? "[]");
+    const donViTinh = @Html.Raw(ViewBag.DonViTinhJson ?? "[]");
+    const duongDung = @Html.Raw(ViewBag.DuongDungJson ?? "[]");
+    const nuocSanXuat = @Html.Raw(ViewBag.NuocSanXuatJson ?? "[]");
+    const hangSanXuat = @Html.Raw(ViewBag.HangSanXuatJson ?? "[]");
+    const nhomChiPhi = @Html.Raw(ViewBag.NhomChiPhiJson ?? "[]");
+    const nhaThau = @Html.Raw(ViewBag.NhaThauJson ?? "[]");
+    const nguonChiTra = @Html.Raw(ViewBag.NguonChiTraJson ?? "[]");
+
+    document.addEventListener("DOMContentLoaded", function () {
+
+        var success = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(TempData["Success"]));
+        var error = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(TempData["Error"]));
+
+        if (success) { showSuccess(success); }
+        if (error) { showError(error); }
+    });
+</script>
+<script src="~/js/hanghoa.js"></script>

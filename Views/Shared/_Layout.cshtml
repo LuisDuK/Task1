@@ -1,49 +1,184 @@
 ﻿<!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - QLHangHoa</title>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/QLHangHoa.styles.css" asp-append-version="true" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> @ViewData["Title"] </title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="~/css/hanghoa.css" />
+    <link rel="stylesheet" href="~/css/modal.css" />
 </head>
+
 <body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">QLHangHoa</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
+    <div class="container">
+        <div class="header">
+            <div class="search-box">
+                <input type="text" id="searchInput" class="search-input" placeholder="Tìm kiếm thông tin">
+                <button class="search-btn"><i class="fas fa-chevron-down"></i></button>
+                <button class="search-btn" style="margin-left:10px;" onclick="searchData()"><i class="fas fa-search"></i></button>
+            </div>
+
+            <div class="dropdown-box">
+                <select id="filterNhom" class="form-select-filter" onchange="filterByNhom()">
+                    <option value="">-- Theo nhóm hàng hóa --</option>
+                </select>
+            </div>
+
+            <div class="header-actions">
+                <button class="btn btn-success">
+                    <i class="fa-solid fa-file-export"></i>
+                    Nhập Excel
                 </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
-                    </ul>
+
+                <button class="btn btn-success">
+                    <i class="fa-solid fa-file-export"></i>
+                    Xuất Excel
+                </button>
+
+                <button class="btn btn-primary" onclick="onAddNewClick()">
+                    <i class="fas fa-plus"></i>
+                    Thêm mới
+                </button>
+                <button class="btn btn-primary" onclick="window.location.href='/hangHoa/khoiphuc'">
+                    Khôi phục hàng hóa
+                </button>
+                <div style="position: relative;">
+                    <button class="btn btn-menu" onclick="toggleColumnMenu()">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <div id="columnMenu" class="column-menu">
+                   
+                        <div class="column-menu-body">
+                            <label class="column-checkbox">
+                                <input type="checkbox" checked data-column="MaNhom">
+                                <span>Nhóm hàng hóa</span>
+                            </label>
+                            <label class="column-checkbox">
+                                <input type="checkbox" checked data-column="MaHang">
+                                <span>Mã hàng hóa</span>
+                            </label>
+                            <label class="column-checkbox">
+                                <input type="checkbox" checked data-column="TenHang">
+                                <span>Tên hàng hóa</span>
+                            </label>
+                            <label class="column-checkbox">
+                                <input type="checkbox" data-column="DonViTinhNhap">
+                                <span>Đơn vị tính nhập</span>
+                            </label>
+                            <label class="column-checkbox">
+                                <input type="checkbox" data-column="DonViTinhXuat">
+                                <span>Đơn vị tính xuất</span>
+                            </label>
+                            <label class="column-checkbox">
+                                <input type="checkbox" data-column="SoLuongQuyDoi">
+                                <span>Số lượng quy đổi</span>
+                            </label>
+                            <label class="column-checkbox">
+                                <input type="checkbox" checked data-column="MaDuong">
+                                <span>Mã đường dùng</span>
+                            </label>
+                            <label class="column-checkbox">
+                                <input type="checkbox" data-column="DuongDung">
+                                <span>Đường dùng</span>
+                            </label>
+                            <label class="column-checkbox">
+                                <input type="checkbox" data-column="NuocSanXuat">
+                                <span>Nước sản xuất</span>
+                            </label>
+                            <label class="column-checkbox">
+                                <input type="checkbox" data-column="HangSanXuat">
+                                <span>Hãng sản xuất</span>
+                            </label>
+                            <label class="column-checkbox">
+                                <input type="checkbox" checked data-column="HamLuong">
+                                <span>Hàm lượng</span>
+                            </label>
+                            <label class="column-checkbox">
+                                <input type="checkbox" checked data-column="HoatChat">
+                                <span>Hoạt chất</span>
+                            </label>
+                            <label class="column-checkbox">
+                                <input type="checkbox" checked data-column="MaAnhXa">
+                                <span>Mã ánh xạ</span>
+                            </label>
+                            <label class="column-checkbox">
+                                <input type="checkbox" data-column="MaPPCheBien">
+                                <span>Mã phương pháp chế biến</span>
+                            </label>
+                            <label class="column-checkbox">
+                                <input type="checkbox" data-column="SoLuongMin">
+                                <span>Số lượng min</span>
+                            </label>
+                            <label class="column-checkbox">
+                                <input type="checkbox" data-column="SoLuongMax">
+                                <span>Số lượng max</span>
+                            </label>
+                            <label class="column-checkbox">
+                                <input type="checkbox" data-column="SoNgayDung">
+                                <span>Số ngày dùng thuốc</span>
+                            </label>
+                            <label class="column-checkbox">
+                                <input type="checkbox" data-column="MaNhomChiPhi">
+                                <span>Mã nhóm chi phí</span>
+                            </label>
+                            <label class="column-checkbox">
+                                <input type="checkbox" data-column="NguonChiTra">
+                                <span>Nguồn chi trả</span>
+                            </label>
+                            <label class="column-checkbox">
+                                <input type="checkbox" data-column="DangBaoChe">
+                                <span>Dạng bào chế</span>
+                            </label>
+                            <label class="column-checkbox">
+                                <input type="checkbox" checked data-column="Bhyt">
+                                <span>BHYT</span>
+                            </label>
+                            <label class="column-checkbox">
+                                <input type="checkbox" data-column="MaBarcode">
+                                <span>Mã barcode</span>
+                            </label>
+                            <label class="column-checkbox">
+                                <input type="checkbox" data-column="SoDangKy">
+                                <span>Số đăng ký</span>
+                            </label>
+                            <label class="column-checkbox">
+                                <input type="checkbox" data-column="QuyCachDongGoi">
+                                <span>Quy cách đóng gói</span>
+                            </label>
+                            <label class="column-checkbox">
+                                <input type="checkbox" checked data-column="ThongTinThau">
+                                <span>Thông tin thầu</span>
+                            </label>
+                            <label class="column-checkbox">
+                                <input type="checkbox" data-column="NhaThau">
+                                <span>Nhà thầu</span>
+                            </label>
+                            <label class="column-checkbox">
+                                <input type="checkbox" data-column="GiaThau">
+                                <span>Giá thầu</span>
+                            </label>
+                            <label class="column-checkbox">
+                                <input type="checkbox" data-column="TiLeBHYT">
+                                <span>Tỷ lệ BHYT</span>
+                            </label>
+                            <label class="column-checkbox">
+                                <input type="checkbox" data-column="TiLeThanhToan">
+                                <span>Tỷ lệ thanh toán</span>
+                            </label>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </nav>
-    </header>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
-    </div>
-
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2025 - QLHangHoa - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
         </div>
-    </footer>
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
+        <div class="body-container">
+
+            @RenderBody()
+
+        </div>
+
+    </div>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
+</html>
 </html>
