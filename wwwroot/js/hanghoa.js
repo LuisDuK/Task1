@@ -32,12 +32,12 @@ document.addEventListener('DOMContentLoaded', function () {
             const isChecked = this.checked;
 
             toggleTableColumn(columnName, isChecked);
-            saveColumnSettings();
+          //  saveColumnSettings();
         });
     });
 
     // Load settings đã lưu
-    loadColumnSettings();
+    //loadColumnSettings();
 });
 
 // Hàm ẩn/hiện cột - DÙNG data-column thay vì index
@@ -70,7 +70,7 @@ function toggleTableColumn(columnName, show) {
     });
 }
 
-// Lưu settings
+// Lưu settings - không dùng trong ví dụ này
 function saveColumnSettings() {
     const settings = {};
     document.querySelectorAll('.column-checkbox input').forEach(checkbox => {
@@ -79,7 +79,7 @@ function saveColumnSettings() {
     localStorage.setItem('columnSettings', JSON.stringify(settings));
 }
 
-// Load settings
+// Load settings - không dùng trong ví dụ này
 function loadColumnSettings() {
     const saved = localStorage.getItem('columnSettings');
     if (!saved) return;

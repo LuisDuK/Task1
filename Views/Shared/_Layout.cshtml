@@ -39,9 +39,7 @@
                     <i class="fas fa-plus"></i>
                     Thêm mới
                 </button>
-                <button class="btn btn-primary" onclick="window.location.href='/hangHoa/khoiphuc'">
-                    Khôi phục hàng hóa
-                </button>
+                
                 <div style="position: relative;">
                     <button class="btn btn-menu" onclick="toggleColumnMenu()">
                         <i class="fas fa-bars"></i>
@@ -173,9 +171,13 @@
         <div class="body-container">
 
             @RenderBody()
-
         </div>
-
+        <div style="display:flex; justify-content: flex-end;">
+            <button class="btn btn-primary" onclick="window.location.href='/hangHoa/khoiphuc'">
+                <i class="fas fa-undo"></i>
+                Khôi phục hàng hóa
+            </button>
+        </div>
     </div>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     @await RenderSectionAsync("Scripts", required: false)
