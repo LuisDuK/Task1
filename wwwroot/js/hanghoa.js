@@ -603,3 +603,157 @@ document.getElementById("notifyOverlay").addEventListener("click", (e) => {
 function showSuccess(msg) { showNotifyModal({ type: "success", title: "Thành công", message: msg }); }
 function showError(msg) { showNotifyModal({ type: "error", title: "Có lỗi", message: msg, duration: 4000 }); }
 function showInfo(msg) { showNotifyModal({ type: "info", title: "Thông báo", message: msg }); }
+
+// Xuất / nhập file excel
+function exportToExcel() {
+    // Gửi request lên server
+    fetch('/HangHoa/ExportExcel', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            MaNhom: selectedNhom,
+            SearchTerm: document.getElementById('searchInput').value
+        })
+    })
+        .then(response => {
+            if (!response.ok) throw new Error('Export failed');
+            return response.blob();
+        })
+        .then(blob => {
+            // Tạo link download
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `DanhSachHangHoa_${new Date().toISOString().slice(0, 10)}.xlsx`;
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+
+            showSuccess('Đã xuất Excel thành công!');
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showError('Có lỗi khi xuất Excel: ' + error.message);
+        })
+       ;
+}
+function handleExcelFile(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    // Kiểm tra file extension
+    const fileName = file.name;
+    if (!fileName.endsWith('.xlsx') && !fileName.endsWith('.xls')) {
+        showError('Vui lòng chọn file Excel (.xlsx hoặc .xls)');
+        return;
+    }
+
+    // Đọc file
+    const reader = new FileReader();
+
+    reader.onload = function (e) {
+        try {
+            // Parse Excel
+            const data = new Uint8Array(e.target.result);
+            const workbook = XLSX.read(data, { type: 'array' });
+
+            // Lấy sheet đầu tiên
+            const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+
+            // Chuyển sang JSON
+            const jsonData = XLSX.utils.sheet_to_json(firstSheet);
+
+            const normalizedData = jsonData.map(item => ({
+       
+                NhomHangHoa: item["Nhóm hàng hóa"] || "",
+                TenHang: item["Tên hàng hóa"] || "",
+                MaHang: item["Mã hàng hóa"] || "",
+                DonViTinhNhap: item["Đơn vị tính nhập"] || "",
+                DonViTinhXuat: item["Đơn vị tính xuất"] || "",
+                SoLuongQuyDoi: item["Số lượng quy đổi"] || "",
+                MaDuong: item["Mã đường dùng"] || "",
+                DuongDung: item["Đường dùng"] || "",
+                NuocSanXuat: item["Nước sản xuất"] || "",
+                HangSanXuat: item["Hãng sản xuất"] || "",
+                HamLuong: item["Hàm lượng"] || "",
+                HoatChat: item["Hoạt chất"] || "",
+                MaAnhXa: item["Mã ánh xạ"] || "",
+                MaPPCheBien: item["Mã PP chế biến"] || "",
+                SoLuongMin: item["SL min"] || "",
+                SoLuongMax: item["SL max"] || "",
+                SoNgayDung: item["Số ngày dùng"] || "",
+                MaNhomChiPhi: item["Nhóm chi phí"] || "",
+                NhomChiPhi: item["Nhóm chi phí"] || "",
+                NguonChiTra: item["Nguồn chi trả"] || "",
+                DangBaoChe: item["Dạng bào chế"] || "",
+                Bhyt: item["BHYT"] || "",
+                MaBarcode: item["Mã barcode"] || "",
+                SoDangKy: item["Số đăng ký"] || "",
+                QuyCachDongGoi: item["Quy cách đóng gói"] || "",
+                ThongTinThau: item["Thông tin thầu"] || "",
+                NhaThau: item["Nhà thầu"] || "",
+                GiaThau: item["Giá thầu"] || "",
+                TiLeBHYT: item["Tỷ lệ BHYT"] || "",
+                TiLeThanhToan: item["Tỷ lệ thanh toán"] || ""
+            }));
+            console.log('Parsed data:', normalizedData);
+
+            // Gửi lên server
+            uploadExcelData(normalizedData);
+
+        } catch (error) {
+            console.error('Error parsing Excel:', error);
+            showError('Lỗi khi đọc file Excel: ' + error.message);
+        }
+    };
+
+    reader.onerror = function () {
+        showError('Không thể đọc file');
+    };
+
+    reader.readAsArrayBuffer(file);
+
+    // Reset input để có thể chọn lại cùng file
+    event.target.value = '';
+}
+
+function uploadExcelData(data) {
+    if (!data || data.length === 0) {
+        showError('File Excel không có dữ liệu');
+        return;
+    }
+
+    showInfo(`Đang import ${data.length} dòng dữ liệu...`);
+
+    fetch('/HangHoa/ImportExcel', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+    }) 
+        .then(response => response.json())
+        .then(result => {
+            if (result.success) {
+                if (result.successCount === 0) {
+                    showSuccess(`Không có bản ghi nào được import. Kiểm tra console để xem lỗi. `);
+                    console.error('Import errors:', result.errors);
+                } else {
+                    showSuccess(`Import thành công ${result.successCount}/${data.length} bản ghi`);
+                    location.reload();
+                }
+            } else {
+                showError(result.errors || 'Import thất bại');
+                if (result.errors && result.errors.length > 0) {
+                    console.error('Import errors:', result.errors);
+                }
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showError('Có lỗi khi import: ' + error.message);
+        });
+}

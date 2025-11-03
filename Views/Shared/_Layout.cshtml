@@ -7,6 +7,9 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="~/css/hanghoa.css" />
     <link rel="stylesheet" href="~/css/modal.css" />
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" defer></script>
+
+
 </head>
 
 <body>
@@ -25,12 +28,14 @@
             </div>
 
             <div class="header-actions">
-                <button class="btn btn-success">
-                    <i class="fa-solid fa-file-export"></i>
+                <input type="file" id="excelFileInput" accept=".xlsx,.xls" style="display: none;" onchange="handleExcelFile(event)">
+
+                <button class="btn btn-success" onclick="document.getElementById('excelFileInput').click()">
+                    <i class="fa-solid fa-file-import"></i>
                     Nhập Excel
                 </button>
 
-                <button class="btn btn-success">
+                <button class="btn btn-success" onclick="exportToExcel()">
                     <i class="fa-solid fa-file-export"></i>
                     Xuất Excel
                 </button>
@@ -180,6 +185,7 @@
         </div>
     </div>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

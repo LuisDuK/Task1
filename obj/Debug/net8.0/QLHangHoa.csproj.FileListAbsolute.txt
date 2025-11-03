@@ -167,3 +167,11 @@ D:\HocCsharp\QLHangHoa\QLHangHoa\obj\Debug\net8.0\QLHangHoa.pdb
 D:\HocCsharp\QLHangHoa\QLHangHoa\obj\Debug\net8.0\QLHangHoa.genruntimeconfig.cache
 D:\HocCsharp\QLHangHoa\QLHangHoa\obj\Debug\net8.0\ref\QLHangHoa.dll
 D:\HocCsharp\QLHangHoa\QLHangHoa\obj\Debug\net8.0\QLHangHoa.sourcelink.json
+D:\HocCsharp\QLHangHoa\QLHangHoa\bin\Debug\net8.0\ClosedXML.dll
+D:\HocCsharp\QLHangHoa\QLHangHoa\bin\Debug\net8.0\ClosedXML.Parser.dll
+D:\HocCsharp\QLHangHoa\QLHangHoa\bin\Debug\net8.0\DocumentFormat.OpenXml.dll
+D:\HocCsharp\QLHangHoa\QLHangHoa\bin\Debug\net8.0\DocumentFormat.OpenXml.Framework.dll
+D:\HocCsharp\QLHangHoa\QLHangHoa\bin\Debug\net8.0\ExcelNumberFormat.dll
+D:\HocCsharp\QLHangHoa\QLHangHoa\bin\Debug\net8.0\RBush.dll
+D:\HocCsharp\QLHangHoa\QLHangHoa\bin\Debug\net8.0\SixLabors.Fonts.dll
+D:\HocCsharp\QLHangHoa\QLHangHoa\bin\Debug\net8.0\System.IO.Packaging.dll

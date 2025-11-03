@@ -2,6 +2,9 @@
 using Microsoft.EntityFrameworkCore;
 using QLHangHoa.Models;
 using System.Text.Json;
+using ClosedXML.Excel;
+using System.Drawing;
+
 
 namespace QLHangHoa.Controllers
 {
@@ -511,7 +514,6 @@ namespace QLHangHoa.Controllers
                 return RedirectToAction("KhoiPhuc");
             }
         }
-
         [HttpPost]
         public async Task<IActionResult> SuaHangHoa(HangHoa vm)
         {
@@ -570,6 +572,317 @@ namespace QLHangHoa.Controllers
                 TempData["Error"] = "Có lỗi xảy ra. Vui lòng thử lại." + ex.Message;
                 return View("Index");
             }
+        }
+        [HttpPost]
+        public async Task<IActionResult> ExportExcel([FromBody] ExportRequest request)
+        {
+            try
+            {
+                // Lấy dữ liệu cần export
+                var query = _context.HangHoas
+                   .Include(h => h.NhomHangHoa)
+                   .Include(h => h.DvtNhap)
+                   .Include(h => h.DvtXuat)
+                   .Include(h => h.DuongDung)
+                   .Include(h => h.Nuoc)
+                   .Include(h => h.HangSx)
+                   .Include(h => h.NhaThau)
+                   .Include(h => h.NhomChiPhi)
+                   .Include(h => h.NguonChiTra)
+                   .AsNoTracking()
+                   .Where(h => h.TrangThai == 1);
+
+                // Lọc theo điều kiện
+                if (!string.IsNullOrEmpty(request.MaNhom))
+                {
+                    query = query.Where(h => h.NhomHangHoa.MaNhom == request.MaNhom);
+                }
+
+                if (!string.IsNullOrEmpty(request.SearchTerm))
+                {
+                    var term = request.SearchTerm.ToLower();
+                    query = query.Where(h =>
+                        h.TenHang.ToLower().Contains(term) ||
+                        h.MaHang.ToLower().Contains(term));
+                }
+
+                var data = await query
+                           .Select(h => new
+                           {
+                               NhomHangHoa = h.NhomHangHoa.TenNhom,
+                               TenHang = h.TenHang,
+                               MaHang = h.MaHang,
+                               DonViTinhNhap = h.DvtNhap != null ? h.DvtNhap.TenDvt : "",
+                               DonViTinhXuat = h.DvtXuat != null ? h.DvtXuat.TenDvt : "",
+                               SoLuongQuyDoi = h.SoLuongQuyDoi,
+                               MaDuong = h.MaDuongDung,
+                               DuongDung = h.DuongDung != null ? h.DuongDung.TenDuong : "",
+                               NuocSanXuat = h.Nuoc != null ? h.Nuoc.TenNuoc : "",
+                               HangSanXuat = h.HangSx != null ? h.HangSx.TenHang : "",
+                               HamLuong = h.HamLuong,
+                               HoatChat = h.HoatChatText,
+                               MaAnhXa = h.MaAnhXa,
+                               MaPpCheBien = h.MaPpCheBien,
+                               SoLuongMin = h.SlMin,
+                               SoLuongMax = h.SlMax,
+                               SoNgayDung = h.SoNgayDung,
+                               NhomChiPhi = h.NhomChiPhi != null ? h.NhomChiPhi.TenNhom : "",
+                               NguonChiTra = h.NguonChiTra != null ? h.NguonChiTra.TenNguon : "",
+                               DangBaoChe = h.DangBaoChe,
+                               Bhyt = h.Bhyt ? "Có" : "Không",
+                               MaBarcode = h.MaBarcode,
+                               SoDangKy = h.SoDangKy,
+                               QuyCachDongGoi = h.QuyCachDongGoi,
+                               ThongTinThau = h.ThongTinThau,
+                               NhaThau = h.NhaThau != null ? h.NhaThau.TenNhaThau : "",
+                               GiaThau = h.GiaThau,
+                               TiLeBHYT = h.TiLeBhyt,
+                               TiLeThanhToan = h.TiLeThanhToan
+                           })
+                           .OrderBy(x => x.TenHang)
+                           .ToListAsync();
+
+                // Tạo Excel file
+                using (var workbook = new XLWorkbook())
+                {
+                    var ws = workbook.Worksheets.Add("Danh sách hàng hóa");
+
+                    // === Header ===
+                    string[] headers = new[]
+                    {
+                "Nhóm hàng hóa", "Tên hàng hóa", "Mã hàng hóa",
+                "Đơn vị tính nhập", "Đơn vị tính xuất", "Số lượng quy đổi",
+                "Mã đường dùng", "Đường dùng", "Nước sản xuất", "Hãng sản xuất",
+                "Hàm lượng", "Hoạt chất", "Mã ánh xạ", "Mã PP chế biến",
+                "SL min", "SL max", "Số ngày dùng", "Nhóm chi phí",
+                "Nguồn chi trả", "Dạng bào chế", "BHYT", "Mã barcode",
+                "Số đăng ký", "Quy cách đóng gói", "Thông tin thầu",
+                "Nhà thầu", "Giá thầu", "Tỷ lệ BHYT", "Tỷ lệ thanh toán"
+            };
+
+                    for (int i = 0; i < headers.Length; i++)
+                        ws.Cell(1, i + 1).Value = headers[i];
+
+                    var headerRange = ws.Range(1, 1, 1, headers.Length);
+                    headerRange.Style.Font.Bold = true;
+                    headerRange.Style.Fill.BackgroundColor = XLColor.LightGray;
+
+                    // === Data ===
+                    int row = 2;
+                    foreach (var item in data)
+                    {
+                        ws.Cell(row, 1).Value = item.NhomHangHoa;
+                        ws.Cell(row, 2).Value = item.TenHang;
+                        ws.Cell(row, 3).Value = item.MaHang;
+                        ws.Cell(row, 4).Value = item.DonViTinhNhap;
+                        ws.Cell(row, 5).Value = item.DonViTinhXuat;
+                        ws.Cell(row, 6).Value = item.SoLuongQuyDoi;
+                        ws.Cell(row, 7).Value = item.MaDuong;
+                        ws.Cell(row, 8).Value = item.DuongDung;
+                        ws.Cell(row, 9).Value = item.NuocSanXuat;
+                        ws.Cell(row, 10).Value = item.HangSanXuat;
+                        ws.Cell(row, 11).Value = item.HamLuong;
+                        ws.Cell(row, 12).Value = item.HoatChat;
+                        ws.Cell(row, 13).Value = item.MaAnhXa;
+                        ws.Cell(row, 14).Value = item.MaPpCheBien;
+                        ws.Cell(row, 15).Value = item.SoLuongMin;
+                        ws.Cell(row, 16).Value = item.SoLuongMax;
+                        ws.Cell(row, 17).Value = item.SoNgayDung;
+                        ws.Cell(row, 18).Value = item.NhomChiPhi;
+                        ws.Cell(row, 19).Value = item.NguonChiTra;
+                        ws.Cell(row, 20).Value = item.DangBaoChe;
+                        ws.Cell(row, 21).Value = item.Bhyt;
+                        ws.Cell(row, 22).Value = item.MaBarcode;
+                        ws.Cell(row, 23).Value = item.SoDangKy;
+                        ws.Cell(row, 24).Value = item.QuyCachDongGoi;
+                        ws.Cell(row, 25).Value = item.ThongTinThau;
+                        ws.Cell(row, 26).Value = item.NhaThau;
+                        ws.Cell(row, 27).Value = item.GiaThau;
+                        ws.Cell(row, 28).Value = item.TiLeBHYT;
+                        ws.Cell(row, 29).Value = item.TiLeThanhToan;
+                        row++;
+                    }
+
+                    ws.Columns().AdjustToContents();
+
+                    // Trả về file
+                    using (var stream = new MemoryStream())
+                    {
+                        workbook.SaveAs(stream);
+                        var content = stream.ToArray();
+                        var fileName = $"DanhSachHangHoa_{DateTime.Now:yyyyMMdd}.xlsx";
+
+                        return File(content,
+                            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                            fileName);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = ex.Message });
+            }
+        }
+
+        public class ExportRequest
+        {
+            public string? MaNhom { get; set; }
+            public string? SearchTerm { get; set; }
+        }
+        [HttpPost]
+        public async Task<IActionResult> ImportExcel([FromBody] List<HangHoaDto> data)
+        {
+
+            var successCount = 0;
+            var errors = new List<string>();
+
+            try
+            {
+                foreach (var row in data)
+                {
+                    try
+                    {
+                        if (string.IsNullOrWhiteSpace(row.NhomHangHoa) ||
+                            string.IsNullOrWhiteSpace(row.TenHang) ||
+                            string.IsNullOrWhiteSpace(row.DonViTinhNhap) ||
+                            string.IsNullOrWhiteSpace(row.DonViTinhXuat) ||
+                            string.IsNullOrWhiteSpace(row.MaAnhXa) ||
+                            string.IsNullOrWhiteSpace(row.NhomChiPhi) ||
+                            string.IsNullOrWhiteSpace(row.NguonChiTra))
+                        {
+                            errors.Add($"Thiếu thông tin bắt buộc tại dòng {data.IndexOf(row) + 1}");
+                            continue;
+                        }
+                        int line = data.IndexOf(row) + 1;
+
+                        // Validate cơ bản
+                        if (string.IsNullOrEmpty(row.TenHang))
+                        {
+                            errors.Add($"Dòng {line}: Thiếu tên hàng hóa");
+                            continue;
+                        }
+
+                        // === Tìm các Id tham chiếu ===
+                        var nhom = await _context.NhomHangHoas
+                            .FirstOrDefaultAsync(x => x.TenNhom == row.NhomHangHoa);
+
+                        if (nhom == null)
+                        {
+                            errors.Add($"Dòng {line}: Không tìm thấy nhóm hàng hóa '{row.NhomHangHoa}'");
+                            continue;
+                        }
+
+                        var duongDung = await _context.DuongDungs
+                            .FirstOrDefaultAsync(x => x.MaDuong == row.DuongDung);
+
+                        var dvtNhap = await _context.DonViTinhs
+                            .FirstOrDefaultAsync(x => x.TenDvt == row.DonViTinhNhap);
+
+                        var dvtXuat = await _context.DonViTinhs
+                            .FirstOrDefaultAsync(x => x.TenDvt == row.DonViTinhXuat);
+
+                        var nuoc = await _context.NuocSanXuats
+                            .FirstOrDefaultAsync(x => x.TenNuoc == row.NuocSanXuat);
+
+                        var hangSx = await _context.HangSanXuats
+                            .FirstOrDefaultAsync(x => x.TenHang == row.HangSanXuat);
+
+                        var nhaThau = await _context.NhaThaus
+                            .FirstOrDefaultAsync(x => x.TenNhaThau == row.NhaThau);
+
+                        var nhomChiPhi = await _context.NhomChiPhis
+                            .FirstOrDefaultAsync(x => x.TenNhom == row.NhomChiPhi);
+
+                        var nguonChiTra = await _context.NguonChiTras
+                            .FirstOrDefaultAsync(x => x.TenNguon == row.NguonChiTra);
+
+                        if (nhom == null || dvtNhap == null || dvtXuat == null || nhomChiPhi == null || nguonChiTra == null)
+                        {
+                            errors.Add($"Không tìm thấy khóa ngoại tại dòng {data.IndexOf(row) + 1}");
+                            continue;
+                        }
+
+                        // === Tạo đối tượng mới ===
+                        var hangHoa = new HangHoa
+                        {
+                            TenHang = row.TenHang,
+                            MaNhom = nhom.Id,
+                            DvtNhapId = dvtNhap.Id,
+                            DvtXuatId = dvtXuat.Id,
+                            SoLuongQuyDoi = row.SoLuongQuyDoi,
+                            MaDuongDung = row.DuongDung,
+                            NuocId = nuoc?.Id,
+                            HangSxId = hangSx?.Id,
+                            HamLuong = row.HamLuong,
+                            HoatChatText = row.HoatChat,
+                            MaAnhXa = row.MaAnhXa,
+                            MaPpCheBien = row.MaPPCheBien,
+                            SlMin = row.SoLuongMin,
+                            SlMax = row.SoLuongMax,
+                            SoNgayDung = row.SoNgayDung?? 0,
+                            NhomChiPhiId = nhomChiPhi.Id,
+                            NguonChiTraId = nguonChiTra.Id,
+                            DangBaoChe = row.DangBaoChe,
+                            Bhyt = (row.Bhyt ?? "").Trim().ToLower() == "có",
+                            MaBarcode = row.MaBarcode,
+                            SoDangKy = row.SoDangKy,
+                            QuyCachDongGoi = row.QuyCachDongGoi,
+                            ThongTinThau = row.ThongTinThau,
+                            MaNhaThau = nhaThau?.Id,
+                            GiaThau = row.GiaThau,
+                            TiLeBhyt = row.TiLeBHYT,
+                            TiLeThanhToan =row.TiLeThanhToan,
+                            TrangThai = 1
+                        };
+                        hangHoa.MaHang = await TaoMaHangHoa(hangHoa.MaNhom);
+                        _context.HangHoas.Add(hangHoa);
+                        await _context.SaveChangesAsync();
+                        successCount++;
+                    }
+                    catch (Exception ex)
+                    {
+                        var inner = ex.InnerException?.Message ?? "";
+                        errors.Add($"Dòng {data.IndexOf(row) + 1}: {ex.Message} {inner}");
+                    }
+                }
+
+                return Json(new
+                {
+                    success = true,
+                    successCount,
+                    totalCount = data.Count,
+                    errors
+                });
+            }
+            catch (Exception ex)
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = ex.Message
+                });
+            }
+        }
+
+        private double? ParseNullableDouble(string input)
+        {
+            if (double.TryParse(input, out var val))
+                return val;
+            return null;
+        }
+
+        private int? ParseNullableInt(string input)
+        {
+            if (int.TryParse(input, out var val))
+                return val;
+            return null;
+        }
+
+        private decimal? ParseNullableDecimal(string input)
+        {
+            if (decimal.TryParse(input, out var val))
+                return val;
+            return null;
         }
 
     }
