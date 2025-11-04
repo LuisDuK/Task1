@@ -769,7 +769,10 @@ function uploadExcelData(data) {
                     
                 } else {
                     showSuccess(`Import thành công ${result.successCount}/${data.length} bản ghi`);
-                    location.reload();
+                    // Cập nhật bảng:
+                    setTimeout(() => {
+                        location.reload();
+                    }, 1500);
                 }
             } else {
                 showError(result.errors || 'Import thất bại');
