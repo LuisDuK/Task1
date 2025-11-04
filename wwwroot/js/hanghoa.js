@@ -1,19 +1,15 @@
-﻿//console.log(nhomHangHoa);
-// Biến phân trang
+﻿// Biến phân trang
 let currentPage = 1;
 let pageSize = 10;
 let filteredData = [...allData];
 let selectedNhom = "";
-
-
-
 // Hiển thị menu
 function toggleColumnMenu() {
     const menu = document.getElementById('columnMenu');
     menu.classList.toggle('active');
 }
 
-// Close menu when click outside
+// Tắt menu khi click bên ngoài
 document.addEventListener('click', function (e) {
     const menu = document.getElementById('columnMenu');
     const menuBtn = e.target.closest('.btn-menu');
@@ -69,39 +65,6 @@ function toggleTableColumn(columnName, show) {
         }
     });
 }
-
-// Lưu settings - không dùng trong ví dụ này
-function saveColumnSettings() {
-    const settings = {};
-    document.querySelectorAll('.column-checkbox input').forEach(checkbox => {
-        settings[checkbox.dataset.column] = checkbox.checked;
-    });
-    localStorage.setItem('columnSettings', JSON.stringify(settings));
-}
-
-// Load settings - không dùng trong ví dụ này
-function loadColumnSettings() {
-    const saved = localStorage.getItem('columnSettings');
-    if (!saved) return;
-
-    try {
-        const settings = JSON.parse(saved);
-        Object.keys(settings).forEach(columnName => {
-            const checkbox = document.querySelector(`input[data-column="${columnName}"]`);
-            if (checkbox) {
-                checkbox.checked = settings[columnName];
-                toggleTableColumn(columnName, settings[columnName]);
-            }
-        });
-    } catch (e) {
-        console.error('Error loading column settings:', e);
-    }
-}
-
-// Khởi tạo khi page load
-document.addEventListener('DOMContentLoaded', function () {
-    loadColumnSettings();
-});
 
 initNhomDropdown();
 renderTable();
@@ -222,7 +185,7 @@ function applyFilters() {
 function searchData() {
     applyFilters();
 }
-// Hàm render nút phân trang
+//======================== Hàm render nút phân trang
 function renderPaginationButtons() {
     const totalPages = Math.ceil(filteredData.length / pageSize);
     const pageNumbers = document.getElementById('pageNumbers');
@@ -329,7 +292,7 @@ function changePageSize() {
     renderTable();
 }
 
-// Hàm xóa
+// ===== MODAL FUNCTIONS =====
 let maHangHienTai = null;
 let hanhDongHienTai = null; // 'delete' hoặc 'restore'
 
@@ -339,47 +302,39 @@ function openActionModal(maHang, actionType) {
     hanhDongHienTai = actionType;
 
     const overlay = document.getElementById('actionOverlay');
-    const form = document.getElementById('actionForm');
     const title = document.getElementById('modalTitle');
     const message = document.getElementById('modalMessage');
     const btn = document.getElementById('actionSubmitBtn');
-    overlay.style.display = 'flex';
-    console.log(overlay);
 
     document.getElementById('actionMaHang').value = maHang;
 
+    // Tuỳ chỉnh giao diện modal theo hành động
     if (actionType === 'delete') {
         title.textContent = 'Xác nhận xóa';
         message.textContent = 'Bạn có chắc chắn muốn xóa hàng hóa này không?';
-        form.action = '/HangHoa/XoaHangHoa';
         btn.textContent = 'Xóa';
         btn.className = 'btn btn-danger';
     } else if (actionType === 'restore') {
         title.textContent = 'Khôi phục hàng hóa';
         message.textContent = 'Bạn có chắc chắn muốn khôi phục hàng hóa này không?';
-        form.action = '/HangHoa/KhoiPhucHangHoa';
         btn.textContent = 'Khôi phục';
         btn.className = 'btn btn-primary';
     }
 
     overlay.style.display = 'flex';
 }
-
 // Đóng modal
 function closeActionModal() {
     document.getElementById('actionOverlay').style.display = 'none';
     maHangHienTai = null;
     hanhDongHienTai = null;
 }
-
 // Cho phép click ngoài modal để đóng
 document.getElementById('actionOverlay').addEventListener('click', function (e) {
     if (e.target === this) {
         closeActionModal();
     }
 });
-///
-// ===== MODAL FUNCTIONS =====
 function openModal() {
     document.getElementById('modalOverlay').classList.add('active');
     document.body.style.overflow = 'hidden';
@@ -389,6 +344,7 @@ function closeModal() {
     document.getElementById('modalOverlay').classList.remove('active');
     document.body.style.overflow = 'auto';
 }
+
 document.getElementById('modalOverlay').addEventListener('click', function (e) {
     if (e.target === this) {
         closeModal();
@@ -486,10 +442,9 @@ selectDD.addEventListener('change', function () {
     // Gán giá trị đó vào ô input
     inputDD.value = selectedValue;
 });
-
 initModalDropdowns();
 
-
+// Hàm thiết lập modal ở chế độ Thêm mới
 function setCreateMode() {
     const form = document.getElementById('productForm');
     form.reset();
@@ -503,7 +458,7 @@ function editItem(maHang) {
     // lấy từ filteredData (đã render bảng)
     const item = filteredData.find(x => x.MaHang === maHang);
     if (!item) { alert('Không tìm thấy dữ liệu để sửa'); return; }
-
+    
     // bật modal & đổi sang "Sửa"
     openModal();
     const form = document.getElementById('productForm');
@@ -564,11 +519,82 @@ function onAddNewClick() {
     setCreateMode();
     openModal();
 }
+//=================== Hàm thêm sửa xóa hàng hóa =======
+//Hàm thêm / sửa 
+$("#productForm").on("submit", function (e) {
+    e.preventDefault();
 
+    const form = this;
+    const formData = new FormData(form);
+    const actionType = form.dataset.mode; // 'edit' hoặc 'add'
+    const url = actionType === "edit"
+        ? "/HangHoa/SuaHangHoa"
+        : "/HangHoa/ThemHangHoa";
+
+    $.ajax({
+        url: url,
+        type: "POST",
+        data: formData,
+        processData: false,
+        contentType: false,
+        success: function (result) {
+            if (result.success) {
+                showSuccess(result.message || "Lưu thành công!");
+                closeModal();
+
+                // Cập nhật bảng:
+                setTimeout(() => {
+                    location.reload();
+                }, 1500);
+            } else {
+                showError(result.message || "Thao tác thất bại!");
+            }
+        },
+        error: function () {
+            showError("Không thể kết nối đến server!");
+        }
+    });
+});
+// Hàm xóa dữ liệu
+$("#actionForm").on('submit', function (e) {
+    e.preventDefault();
+
+    const maHang = document.getElementById('actionMaHang').value;
+    let url = '';
+
+    if (hanhDongHienTai === 'delete') {
+        url = '/HangHoa/XoaHangHoa';
+    } else if (hanhDongHienTai === 'restore') {
+        url = '/HangHoa/KhoiPhucHangHoa';
+    } else {
+        showError('Hành động không hợp lệ!');
+        return;
+    }
+
+    // Gửi yêu cầu AJAX thay vì submit form
+    $.ajax({
+        url: url,
+        type: 'POST',
+        data: { MaHang: maHang },
+        success: function (result) {
+            if (result.success) {
+                filteredData = filteredData.filter(x => x.MaHang !== maHang);
+                renderTable();
+                showSuccess(result.message || 'Thực hiện thành công!');
+                closeActionModal();
+            } else {
+                showError(result.message || 'Thao tác thất bại!');
+            }
+        },
+        error: function () {
+            showError('Không thể kết nối đến server!');
+        }
+    });
+});
 /// NotifyModal
 let notifyTimer = null;
-
-function showNotifyModal({ type = "success", title = "Thành công", message = "", duration = 2500 } = {}) {
+// Hàm hiển thị thông báo
+function showNotifyModal({ type = "success", title = "Thành công", message = "", duration = 4000 } = {}) {
     const overlay = document.getElementById("notifyOverlay");
     const titleEl = document.getElementById("notifyTitle");
     const msgEl = document.getElementById("notifyMessage");
@@ -587,7 +613,7 @@ function showNotifyModal({ type = "success", title = "Thành công", message = "
         notifyTimer = setTimeout(closeNotifyModal, duration);
     }
 }
-
+// Hàm tắt thông báo
 function closeNotifyModal() {
     const overlay = document.getElementById("notifyOverlay");
     overlay.style.display = "none";
@@ -603,7 +629,7 @@ document.getElementById("notifyOverlay").addEventListener("click", (e) => {
 function showSuccess(msg) { showNotifyModal({ type: "success", title: "Thành công", message: msg }); }
 function showError(msg) { showNotifyModal({ type: "error", title: "Có lỗi", message: msg, duration: 4000 }); }
 function showInfo(msg) { showNotifyModal({ type: "info", title: "Thông báo", message: msg }); }
-
+//====== Hàm xuất nhập Excel ======
 // Xuất / nhập file excel
 function exportToExcel() {
     // Gửi request lên server
@@ -640,6 +666,7 @@ function exportToExcel() {
         })
        ;
 }
+// Hàm xử lý file Excel khi chọn
 function handleExcelFile(event) {
     const file = event.target.files[0];
     if (!file) return;
@@ -667,7 +694,6 @@ function handleExcelFile(event) {
             const jsonData = XLSX.utils.sheet_to_json(firstSheet);
 
             const normalizedData = jsonData.map(item => ({
-       
                 NhomHangHoa: item["Nhóm hàng hóa"] || "",
                 TenHang: item["Tên hàng hóa"] || "",
                 MaHang: item["Mã hàng hóa"] || "",
@@ -719,7 +745,7 @@ function handleExcelFile(event) {
     // Reset input để có thể chọn lại cùng file
     event.target.value = '';
 }
-
+// Hàm gửi dữ liệu Excel lên server
 function uploadExcelData(data) {
     if (!data || data.length === 0) {
         showError('File Excel không có dữ liệu');
@@ -739,8 +765,8 @@ function uploadExcelData(data) {
         .then(result => {
             if (result.success) {
                 if (result.successCount === 0) {
-                    showSuccess(`Không có bản ghi nào được import. Kiểm tra console để xem lỗi. `);
-                    console.error('Import errors:', result.errors);
+                    showSuccess(`Không có bản ghi nào được import. Lỗi: ${result.errors}`);
+                    
                 } else {
                     showSuccess(`Import thành công ${result.successCount}/${data.length} bản ghi`);
                     location.reload();

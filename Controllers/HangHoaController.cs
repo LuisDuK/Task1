@@ -413,21 +413,22 @@ namespace QLHangHoa.Controllers
                 var dup = await _context.HangHoas.AnyAsync(h => h.MaHang == hangHoa.MaHang);
                 if (dup)
                 {
-                    ModelState.AddModelError(string.Empty, "Mã hàng hóa đã tồn tại.");
-                    return View("index");
+                   
+                    return Json(new { success = false, message = "Mã hàng hóa đã tồn tại." });
+
                 }
 
                 _context.HangHoas.Add(hangHoa);
                 await _context.SaveChangesAsync();
 
-                TempData["Success"] = "Thêm hàng hóa thành công!";
-                return RedirectToAction("Index");
+                //TempData["Success"] = "Thêm hàng hóa thành công!";
+                return Json(new { success = true, message = "Thêm hàng hóa thành công!", data = hangHoa });
             }
             catch (Exception ex)
             {
-                TempData["Error"] = "Có lỗi xảy ra. Vui lòng thử lại.";
-                ModelState.AddModelError("", "Dữ liệu đã bị thay đổi bởi người khác. Vui lòng thử lại.");
-                return View("index");
+               // TempData["Error"] = "Có lỗi xảy ra. Vui lòng thử lại.";
+                return Json(new { success = false, message = "Có lỗi xảy ra khi thêm hàng hóa.", error = ex.Message });
+               
             }
         }
         [HttpPost]
@@ -465,53 +466,53 @@ namespace QLHangHoa.Controllers
             return $"{maNhom}.{nextNumber:D4}";
         }
         [HttpPost]
-        public IActionResult XoaHangHoa(string MaHang)
+        public async Task<IActionResult> XoaHangHoa(string MaHang)
         {
             try
             {
                 var hangHoa = _context.HangHoas.FirstOrDefault(h => h.MaHang == MaHang);
                 if (hangHoa == null)
                 {
-                    TempData["Error"] = "Hàng hóa không tồn tại.";
-                    return RedirectToAction("Index");
+                   // TempData["Error"] = "Hàng hóa không tồn tại.";
+                    return Json(new { success = false, message = "Không tìm thấy hàng hóa!" });
                 }
 
                 hangHoa.TrangThai = 0;
                 _context.HangHoas.Update(hangHoa);
                 _context.SaveChanges();
 
-                TempData["Success"] = "Xóa thành công.";
-                return RedirectToAction("Index");
+               // TempData["Success"] = "Xóa thành công.";
+                return Json(new { success = true });
             }
             catch (Exception ex)
             {
-                TempData["Error"] = "Đã xảy ra lỗi khi cập nhật: " + ex.Message;
-                return View("Index");
+               // TempData["Error"] = "Đã xảy ra lỗi khi cập nhật: " + ex.Message;
+                return Json(new { success = false, message = ex.Message });
             }
         }
         [HttpPost]
-        public IActionResult KhoiPhucHangHoa(string MaHang)
+        public async Task<IActionResult> KhoiPhucHangHoa(string MaHang)
         {
             try
             {
                 var hangHoa = _context.HangHoas.FirstOrDefault(h => h.MaHang == MaHang);
                 if (hangHoa == null)
                 {
-                    TempData["Error"] = "Hàng hóa không tồn tại.";
-                    return RedirectToAction("Index");
+                    // TempData["Error"] = "Hàng hóa không tồn tại.";
+                    return Json(new { success = false, message = "Không tìm thấy hàng hóa!" });
                 }
 
                 hangHoa.TrangThai = 1;
                 _context.HangHoas.Update(hangHoa);
                 _context.SaveChanges();
 
-                TempData["Success"] = "Khôi phục thành công.";
-                return RedirectToAction("KhoiPhuc");
+               // TempData["Success"] = "Khôi phục thành công.";
+                return Json(new { success = true });
             }
             catch (Exception ex)
             {
-                TempData["Error"] = "Đã xảy ra lỗi khi cập nhật: " + ex.Message;
-                return RedirectToAction("KhoiPhuc");
+             //   TempData["Error"] = "Đã xảy ra lỗi khi cập nhật: " + ex.Message;
+                return Json(new { success = false, message = ex.Message });
             }
         }
         [HttpPost]
@@ -522,8 +523,7 @@ namespace QLHangHoa.Controllers
                 var hangHoa = await _context.HangHoas.FirstOrDefaultAsync(h => h.MaHang == vm.MaHang);
                 if (hangHoa == null)
                 {
-                    ModelState.AddModelError("", "Không tìm thấy hàng hóa cần sửa.");
-                    return View("index");
+                    return Json(new { success = false, message = "Mã hàng hóa đã tồn tại." });
                 }
 
                 // Cập nhật thông tin
@@ -563,14 +563,14 @@ namespace QLHangHoa.Controllers
                 _context.HangHoas.Update(hangHoa);
                 await _context.SaveChangesAsync();
 
-                TempData["Success"] = "Cập nhật hàng hóa thành công!";
-                return RedirectToAction("Index");
+                //  TempData["Success"] = "Cập nhật hàng hóa thành công!";
+                return Json(new { success = true, message = "Cập nhập hàng hóa thành công!", data = hangHoa });
+
             }
             catch (Exception ex)
             {
-                ModelState.AddModelError("", "Có lỗi xảy ra khi sửa hàng hóa: " + ex.Message);
-                TempData["Error"] = "Có lỗi xảy ra. Vui lòng thử lại." + ex.Message;
-                return View("Index");
+                // TempData["Error"] = "Có lỗi xảy ra. Vui lòng thử lại." + ex.Message;
+                return Json(new { success = false, message = "Có lỗi xảy ra khi thêm hàng hóa.", error = ex.Message });
             }
         }
         [HttpPost]
@@ -650,7 +650,7 @@ namespace QLHangHoa.Controllers
                     // === Header ===
                     string[] headers = new[]
                     {
-                "Nhóm hàng hóa", "Tên hàng hóa", "Mã hàng hóa",
+                "STT", "Nhóm hàng hóa", "Tên hàng hóa", "Mã hàng hóa",
                 "Đơn vị tính nhập", "Đơn vị tính xuất", "Số lượng quy đổi",
                 "Mã đường dùng", "Đường dùng", "Nước sản xuất", "Hãng sản xuất",
                 "Hàm lượng", "Hoạt chất", "Mã ánh xạ", "Mã PP chế biến",
@@ -670,36 +670,37 @@ namespace QLHangHoa.Controllers
                     // === Data ===
                     int row = 2;
                     foreach (var item in data)
-                    {
-                        ws.Cell(row, 1).Value = item.NhomHangHoa;
-                        ws.Cell(row, 2).Value = item.TenHang;
-                        ws.Cell(row, 3).Value = item.MaHang;
-                        ws.Cell(row, 4).Value = item.DonViTinhNhap;
-                        ws.Cell(row, 5).Value = item.DonViTinhXuat;
-                        ws.Cell(row, 6).Value = item.SoLuongQuyDoi;
-                        ws.Cell(row, 7).Value = item.MaDuong;
-                        ws.Cell(row, 8).Value = item.DuongDung;
-                        ws.Cell(row, 9).Value = item.NuocSanXuat;
-                        ws.Cell(row, 10).Value = item.HangSanXuat;
-                        ws.Cell(row, 11).Value = item.HamLuong;
-                        ws.Cell(row, 12).Value = item.HoatChat;
-                        ws.Cell(row, 13).Value = item.MaAnhXa;
-                        ws.Cell(row, 14).Value = item.MaPpCheBien;
-                        ws.Cell(row, 15).Value = item.SoLuongMin;
-                        ws.Cell(row, 16).Value = item.SoLuongMax;
-                        ws.Cell(row, 17).Value = item.SoNgayDung;
-                        ws.Cell(row, 18).Value = item.NhomChiPhi;
-                        ws.Cell(row, 19).Value = item.NguonChiTra;
-                        ws.Cell(row, 20).Value = item.DangBaoChe;
-                        ws.Cell(row, 21).Value = item.Bhyt;
-                        ws.Cell(row, 22).Value = item.MaBarcode;
-                        ws.Cell(row, 23).Value = item.SoDangKy;
-                        ws.Cell(row, 24).Value = item.QuyCachDongGoi;
-                        ws.Cell(row, 25).Value = item.ThongTinThau;
-                        ws.Cell(row, 26).Value = item.NhaThau;
-                        ws.Cell(row, 27).Value = item.GiaThau;
-                        ws.Cell(row, 28).Value = item.TiLeBHYT;
-                        ws.Cell(row, 29).Value = item.TiLeThanhToan;
+                    {   
+                        ws.Cell(row, 1).Value = row - 1;
+                        ws.Cell(row, 2).Value = item.NhomHangHoa;
+                        ws.Cell(row, 3).Value = item.TenHang;
+                        ws.Cell(row, 4).Value = item.MaHang;
+                        ws.Cell(row, 5).Value = item.DonViTinhNhap;
+                        ws.Cell(row, 6).Value = item.DonViTinhXuat;
+                        ws.Cell(row, 7).Value = item.SoLuongQuyDoi;
+                        ws.Cell(row, 8).Value = item.MaDuong;
+                        ws.Cell(row, 9).Value = item.DuongDung;
+                        ws.Cell(row, 10).Value = item.NuocSanXuat;
+                        ws.Cell(row, 11).Value = item.HangSanXuat;
+                        ws.Cell(row, 12).Value = item.HamLuong;
+                        ws.Cell(row, 13).Value = item.HoatChat;
+                        ws.Cell(row, 14).Value = item.MaAnhXa;
+                        ws.Cell(row, 15).Value = item.MaPpCheBien;
+                        ws.Cell(row, 16).Value = item.SoLuongMin;
+                        ws.Cell(row, 17).Value = item.SoLuongMax;
+                        ws.Cell(row, 18).Value = item.SoNgayDung;
+                        ws.Cell(row, 19).Value = item.NhomChiPhi;
+                        ws.Cell(row, 20).Value = item.NguonChiTra;
+                        ws.Cell(row, 21).Value = item.DangBaoChe;
+                        ws.Cell(row, 22).Value = item.Bhyt;
+                        ws.Cell(row, 23).Value = item.MaBarcode;
+                        ws.Cell(row, 24).Value = item.SoDangKy;
+                        ws.Cell(row, 25).Value = item.QuyCachDongGoi;
+                        ws.Cell(row, 26).Value = item.ThongTinThau;
+                        ws.Cell(row, 27).Value = item.NhaThau;
+                        ws.Cell(row, 28).Value = item.GiaThau;
+                        ws.Cell(row, 29).Value = item.TiLeBHYT;
+                        ws.Cell(row, 30).Value = item.TiLeThanhToan;
                         row++;
                     }
 
@@ -753,12 +754,11 @@ namespace QLHangHoa.Controllers
                             errors.Add($"Thiếu thông tin bắt buộc tại dòng {data.IndexOf(row) + 1}");
                             continue;
                         }
-                        int line = data.IndexOf(row) + 1;
 
                         // Validate cơ bản
                         if (string.IsNullOrEmpty(row.TenHang))
                         {
-                            errors.Add($"Dòng {line}: Thiếu tên hàng hóa");
+                            errors.Add($"Dòng {row}: Thiếu tên hàng hóa");
                             continue;
                         }
 
@@ -768,7 +768,7 @@ namespace QLHangHoa.Controllers
 
                         if (nhom == null)
                         {
-                            errors.Add($"Dòng {line}: Không tìm thấy nhóm hàng hóa '{row.NhomHangHoa}'");
+                            errors.Add($"Dòng {row}: Không tìm thấy nhóm hàng hóa '{row.NhomHangHoa}'");
                             continue;
                         }
 
@@ -798,7 +798,7 @@ namespace QLHangHoa.Controllers
 
                         if (nhom == null || dvtNhap == null || dvtXuat == null || nhomChiPhi == null || nguonChiTra == null)
                         {
-                            errors.Add($"Không tìm thấy khóa ngoại tại dòng {data.IndexOf(row) + 1}");
+                            errors.Add($"Điền đầy đủ thông tin bắt buộc tại dòng {data.IndexOf(row) + 1}");
                             continue;
                         }
 
@@ -863,28 +863,6 @@ namespace QLHangHoa.Controllers
                 });
             }
         }
-
-        private double? ParseNullableDouble(string input)
-        {
-            if (double.TryParse(input, out var val))
-                return val;
-            return null;
-        }
-
-        private int? ParseNullableInt(string input)
-        {
-            if (int.TryParse(input, out var val))
-                return val;
-            return null;
-        }
-
-        private decimal? ParseNullableDecimal(string input)
-        {
-            if (decimal.TryParse(input, out var val))
-                return val;
-            return null;
-        }
-
     }
 
 }
