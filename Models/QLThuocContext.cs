@@ -32,6 +32,9 @@ public partial class QLThuocContext : DbContext
     public virtual DbSet<NuocSanXuat> NuocSanXuats { get; set; }
 
     public virtual DbSet<NhaThau> NhaThaus { get; set; }
+    public DbSet<NhaCungCap> NhaCungCaps { get; set; }
+    public DbSet<PhieuNhap> PhieuNhaps { get; set; }
+    public DbSet<ChiTietPhieuNhap> ChiTietPhieuNhaps { get; set; }
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
         => optionsBuilder.UseSqlServer("Data Source=MSI;Initial Catalog=task1;Integrated Security=True;Connect Timeout=30;Encrypt=True;TrustServerCertificate=True;ApplicationIntent=ReadWrite;MultiSubnetFailover=False");
@@ -296,7 +299,129 @@ public partial class QLThuocContext : DbContext
             e.Property(x => x.NguoiDaiDien).HasColumnName("nguoi_dai_dien");
             e.HasAlternateKey(x => x.MaNhaThau);
         });
-       
+        modelBuilder.Entity<NhaCungCap>(entity =>
+        {
+            entity.ToTable("nha_cung_cap");
+
+            entity.HasKey(e => e.NhaCungCapId);
+            entity.Property(e => e.NhaCungCapId).HasColumnName("nha_cung_cap_id");
+
+            entity.Property(e => e.TenNhaCungCap)
+                  .HasColumnName("ten_nha_cung_cap")
+                  .HasMaxLength(255)
+                  .IsRequired();
+
+            entity.Property(e => e.DiaChi).HasColumnName("dia_chi").HasMaxLength(255);
+            entity.Property(e => e.SoDienThoai).HasColumnName("so_dien_thoai").HasMaxLength(20);
+            entity.Property(e => e.Email).HasColumnName("email").HasMaxLength(100);
+            entity.Property(e => e.MaSoThue).HasColumnName("ma_so_thue").HasMaxLength(50);
+            entity.Property(e => e.TrangThai).HasColumnName("trang_thai").HasDefaultValue(true);
+
+            // 1 - N: NhaCungCap -> PhieuNhap
+            entity.HasMany(e => e.PhieuNhaps)
+                  .WithOne(p => p.NhaCungCap)
+                  .HasForeignKey(p => p.NhaCungCapId)
+                  .OnDelete(DeleteBehavior.Restrict);
+        });
+        modelBuilder.Entity<PhieuNhap>(entity =>
+        {
+            entity.ToTable("phieu_nhap");
+
+            entity.HasKey(e => e.PhieuNhapId);
+            entity.Property(e => e.PhieuNhapId).HasColumnName("phieu_nhap_id");
+
+            entity.Property(e => e.MaPhieuNhap)
+                  .HasColumnName("ma_phieu_nhap")
+                  .HasMaxLength(50)
+                  .IsRequired();
+
+            entity.Property(e => e.NgayNhap)
+                  .HasColumnName("ngay_nhap")
+                  .HasDefaultValueSql("GETDATE()");
+
+            entity.Property(e => e.NgayHoaDon).HasColumnName("ngay_hoa_don");
+            entity.Property(e => e.SoHoaDon).HasColumnName("so_hoa_don").HasMaxLength(50);
+            entity.Property(e => e.KyHieuHoaDon).HasColumnName("ky_hieu_hoa_don").HasMaxLength(50);
+            entity.Property(e => e.NhaCungCapId).HasColumnName("nha_cung_cap_id");
+            entity.Property(e => e.NguoiNhap).HasColumnName("nguoi_nhap").HasMaxLength(100);
+            entity.Property(e => e.GhiChu).HasColumnName("ghi_chu").HasMaxLength(500);
+
+            entity.Property(e => e.TongTienHang)
+                  .HasColumnName("tong_tien_hang")
+                  .HasColumnType("decimal(18,2)")
+                  .HasDefaultValue(0);
+
+            entity.Property(e => e.TongChietKhau)
+                  .HasColumnName("tong_chiet_khau")
+                  .HasColumnType("decimal(18,2)")
+                  .HasDefaultValue(0);
+
+            entity.Property(e => e.TongThue)
+                  .HasColumnName("tong_thue")
+                  .HasColumnType("decimal(18,2)")
+                  .HasDefaultValue(0);
+
+            entity.Property(e => e.TongCong)
+                  .HasColumnName("tong_cong")
+                  .HasColumnType("decimal(18,2)")
+                  .HasDefaultValue(0);
+
+            entity.Property(e => e.TrangThai)
+                  .HasColumnName("trang_thai")
+                  .HasDefaultValue((byte)1);
+
+            // 1 - N: PhieuNhap -> ChiTietPhieuNhap
+            entity.HasMany(e => e.ChiTietPhieuNhaps)
+                  .WithOne(ct => ct.PhieuNhap)
+                  .HasForeignKey(ct => ct.PhieuNhapId)
+                  .OnDelete(DeleteBehavior.Cascade);
+        });
+        modelBuilder.Entity<ChiTietPhieuNhap>(entity =>
+        {
+            entity.ToTable("chi_tiet_phieu_nhap");
+
+            entity.HasKey(e => e.ChiTietId);
+            entity.Property(e => e.ChiTietId).HasColumnName("chi_tiet_id");
+
+            entity.Property(e => e.PhieuNhapId).HasColumnName("phieu_nhap_id");
+            entity.Property(e => e.HangHoaId).HasColumnName("hang_hoa_id");
+
+            entity.Property(e => e.SoLuong)
+                  .HasColumnName("so_luong")
+                  .HasColumnType("decimal(18,3)")
+                  .IsRequired();
+
+            entity.Property(e => e.SoLuongQuyDoi)
+                  .HasColumnName("so_luong_quy_doi")
+                  .HasColumnType("decimal(18,3)");
+
+            entity.Property(e => e.DonGiaNhap)
+                  .HasColumnName("don_gia_nhap")
+                  .HasColumnType("decimal(18,2)")
+                  .IsRequired();
+
+            entity.Property(e => e.ChietKhau)
+                  .HasColumnName("chiet_khau")
+                  .HasColumnType("decimal(5,2)")
+                  .HasDefaultValue(0);
+
+            entity.Property(e => e.Vat)
+                  .HasColumnName("vat")
+                  .HasColumnType("decimal(5,2)")
+                  .HasDefaultValue(0);
+
+            entity.Property(e => e.NgaySanXuat).HasColumnName("ngay_san_xuat");
+            entity.Property(e => e.HanSuDung).HasColumnName("han_su_dung");
+
+            entity.Property(e => e.SoLo).HasColumnName("so_lo").HasMaxLength(100);
+            entity.Property(e => e.GhiChu).HasColumnName("ghi_chu").HasMaxLength(255);
+
+            // Quan hệ: ChiTietPhieuNhap - PhieuNhap
+            entity.HasOne(e => e.PhieuNhap)
+                  .WithMany(p => p.ChiTietPhieuNhaps)
+                  .HasForeignKey(e => e.PhieuNhapId)
+                  .OnDelete(DeleteBehavior.Cascade);
+        });
         OnModelCreatingPartial(modelBuilder);
     }
 

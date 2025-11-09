@@ -1,0 +1,410 @@
+﻿* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: #f5f5f5;
+    font-size: 13px;
+}
+
+.container {
+    background: white;
+    min-height: 100vh;
+}
+
+/* Top Filter Bar */
+.top-bar {
+    display: flex;
+    justify-content: flex-end;
+    gap: 15px;
+    padding: 12px 15px;
+    background: white;
+    border-bottom: 2px solid #ddd;
+    align-items: center;
+}
+
+.top-bar-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.top-bar-label {
+    font-size: 12px;
+    color: #333;
+    font-weight: 500;
+}
+
+.top-bar-select {
+    padding: 6px 10px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    font-size: 12px;
+    min-width: 200px;
+    background: white;
+}
+
+/* Tabs */
+.tabs {
+    display: flex;
+    background: #1976d2;
+    color: white;
+}
+
+.tab {
+    padding: 12px 24px;
+    cursor: pointer;
+    background: #1976d2;
+    border: none;
+    color: white;
+    font-size: 13px;
+    border-right: 1px solid rgba(255,255,255,0.2);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: background 0.2s;
+}
+
+    .tab:hover {
+        background: #1565c0;
+    }
+
+    .tab.active {
+        background: #ffc107;
+        color: #333;
+    }
+
+/* Tab Content */
+.tab-content {
+    display: none;
+}
+
+    .tab-content.active {
+        display: block;
+    }
+
+/* Form Lập Phiếu */
+.form-header {
+    display: grid;
+    grid-template-columns: repeat(10, 1fr);
+    gap: 10px;
+    padding: 15px;
+    background: #fff9e6;
+    border-bottom: 1px solid #ddd;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.form-label {
+    font-size: 12px;
+    color: #333;
+    white-space: nowrap;
+}
+
+.form-input,
+.form-select {
+    flex: 1;
+    padding: 5px 8px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    font-size: 12px;
+    height: 28px;
+}
+
+.form-select {
+    background: white;
+}
+
+.table-wrapper {
+    overflow-x: auto;
+    padding: 0;
+    min-height: 300px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+}
+
+thead {
+    background: #f0f0f0;
+    position: sticky;
+    top: 0;
+}
+
+th {
+    padding: 8px 5px;
+    border: 1px solid #ddd;
+    font-weight: 600;
+    text-align: center;
+    font-size: 11px;
+    white-space: nowrap;
+}
+
+td {
+    padding: 4px 5px;
+    border: 1px solid #ddd;
+    vertical-align: top;
+}
+
+tbody tr:hover {
+    background: #f9f9f9;
+}
+
+.cell-input {
+    width: 100%;
+    border: none;
+    padding: 4px;
+    font-size: 12px;
+    background: transparent;
+}
+
+    .cell-input:focus {
+        outline: 1px solid #1976d2;
+        background: #fff;
+    }
+
+.cell-select {
+    width: 100%;
+    border: none;
+    padding: 2px;
+    font-size: 11px;
+    background: transparent;
+}
+
+.product-autocomplete {
+    position: relative;
+}
+
+.product-input {
+    width: 100%;
+    padding: 4px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    font-size: 12px;
+}
+
+.autocomplete-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    border: 1px solid #ccc;
+    max-height: 300px;
+    overflow-y: auto;
+    z-index: 1000;
+    display: none;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+    .autocomplete-dropdown.show {
+        display: block;
+    }
+
+.autocomplete-item {
+    padding: 10px;
+    cursor: pointer;
+    border-bottom: 1px solid #eee;
+}
+
+    .autocomplete-item:hover {
+        background: #f0f0f0;
+    }
+
+.item-name {
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 4px;
+}
+
+.item-details {
+    font-size: 11px;
+    color: #666;
+}
+
+.product-detail {
+    background: #f9f9f9;
+    padding: 8px;
+    margin-top: 5px;
+    font-size: 11px;
+    border-radius: 3px;
+    display: none;
+}
+
+    .product-detail.show {
+        display: block;
+    }
+
+.detail-row {
+    margin-bottom: 3px;
+}
+
+.detail-label {
+    font-weight: 600;
+    color: #555;
+}
+
+.btn-delete {
+    background: none;
+    border: none;
+    color: #d32f2f;
+    cursor: pointer;
+    font-size: 14px;
+    padding: 2px 6px;
+}
+
+    .btn-delete:hover {
+        color: #b71c1c;
+    }
+
+.footer {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 15px;
+    padding: 15px;
+    background: #f9f9f9;
+    border-top: 1px solid #ddd;
+}
+
+.footer-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.footer-label {
+    font-size: 12px;
+    color: #555;
+    white-space: nowrap;
+}
+
+.footer-value {
+    flex: 1;
+    padding: 6px 10px;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.actions {
+    padding: 15px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    border-top: 1px solid #ddd;
+}
+
+.btn {
+    padding: 8px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.btn-clear {
+    background: #f5f5f5;
+    color: #333;
+    border: 1px solid #ddd;
+}
+
+    .btn-clear:hover {
+        background: #e0e0e0;
+    }
+
+.btn-save {
+    background: #1976d2;
+    color: white;
+}
+
+    .btn-save:hover {
+        background: #1565c0;
+    }
+
+.text-right {
+    text-align: right;
+}
+
+.text-center {
+    text-align: center;
+}
+
+input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+}
+
+/* Danh sách phiếu */
+.list-header {
+    padding: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #f9f9f9;
+    border-bottom: 1px solid #ddd;
+}
+
+.search-box {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.search-input {
+    padding: 6px 12px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    font-size: 12px;
+    min-width: 250px;
+}
+
+.btn-search {
+    padding: 6px 16px;
+    background: #1976d2;
+    color: white;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+    .btn-search:hover {
+        background: #1565c0;
+    }
+
+.list-table {
+    padding: 15px;
+}
+
+.action-btns {
+    display: flex;
+    gap: 5px;
+    justify-content: center;
+}
+
+.action-btn {
+    padding: 4px 8px;
+    border: 1px solid #ddd;
+    background: white;
+    cursor: pointer;
+    border-radius: 3px;
+    font-size: 11px;
+    color: #1976d2;
+}
+
+    .action-btn:hover {
+        background: #f0f0f0;
+    }

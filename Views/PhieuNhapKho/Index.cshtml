@@ -1,0 +1,343 @@
+﻿@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phiếu nhập kho</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="~/css/phieunhap.css" />
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" defer></script>
+</head>
+<body>
+    <div class="container">
+        <!-- Top Filter Bar -->
+        <div class="top-bar">
+            <div class="top-bar-group">
+                <label class="top-bar-label">Kho:</label>
+                <select class="top-bar-select">
+                    <option selected>Kho Thuốc Dịch Vụ</option>
+                    <option>Kho Thuốc BHYT</option>
+                    <option>Kho Vật Tư</option>
+                </select>
+            </div>
+
+            <div class="top-bar-group">
+                <label class="top-bar-label">Nguồn nhập/xuất:</label>
+                <select class="top-bar-select">
+                    <option value="">-- Chọn nguồn --</option>
+                    <option>Nhập từ nhà cung cấp</option>
+                    <option>Nhập từ kho khác</option>
+                    <option>Xuất bán</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('lapphieu')">
+                <i class="fas fa-file-alt"></i> Lập phiếu
+            </button>
+            <button class="tab" onclick="switchTab('danhsach')">
+                <i class="fas fa-list"></i> Danh sách phiếu
+            </button>
+        </div>
+
+        <!-- Tab Content 1: Lập Phiếu -->
+        <div id="lapphieu" class="tab-content active">
+            <!-- Form Header -->
+            <div class="form-header">
+                <div class="form-group">
+                    <label class="form-label">Số phiếu: <span style="color: red;">*</span></label>
+                    <input type="text" class="form-input" value="Auto" readonly>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Ngày: <span style="color: red;">*</span></label>
+                    <input type="datetime-local" class="form-input" value="2025-11-08T09:58">
+                </div>
+
+                <div class="form-group" style="grid-column: span 3 ;">
+                    <label class="form-label">Nơi cung cấp: <span style="color: red;">*</span></label>
+                    <select class="form-select">
+                        <option>-- Nơi cung cấp --</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Số HĐ:</label>
+                    <input type="text" class="form-input" placeholder="Số hóa đơn">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Ngày HĐ:</label>
+                    <input type="date" class="form-input">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Nhập hàng từ nhà cung cấp:</label>
+                    <select class="form-select">
+                        <option>-- Chọn nhà cung cấp --</option>
+                    </select>
+                </div>
+
+                <div class="form-group" >
+                    <label class="form-label">Kỳ hiệu HĐ:</label>
+                    <input type="text" class="form-input">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Ghi chú:</label>
+                    <input type="text" class="form-input">
+                </div>
+            </div>
+
+            <!-- Table -->
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 30px;">TT</th>
+                            <th style="width: 250px;">Tên hàng hóa</th>
+                            <th style="width: 40px;">Chi phân thuốc BH</th>
+                            <th style="width: 60px;">SL nhập</th>
+                            <th style="width: 60px;">ĐVT nhập</th>
+                            <th style="width: 60px;">SL quy đổi</th>
+                            <th style="width: 80px;">Giá nhập</th>
+                            <th style="width: 90px;">Thành tiền</th>
+                            <th style="width: 70px;">chiết khấu %</th>
+                            <th style="width: 80px;">Số tiền</th>
+                            <th style="width: 60px;">VAT</th>
+                            <th style="width: 100px;">Số lô</th>
+                            <th style="width: 90px;">Ngày SX</th>
+                            <th style="width: 90px;">Hạn SD</th>
+                            <th style="width: 100px;">Ghi chú</th>
+                            <th style="width: 40px;"></th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                        <tr>
+                            <td class="text-center">1</td>
+                            <td>
+                                <div class="product-autocomplete">
+                                    <input type="text" class="product-input" value="Acetylcystein 200mg BH" onfocus="showDropdown(this)" oninput="filterProducts(this)">
+                                    <div class="autocomplete-dropdown">
+                                        <div class="autocomplete-item" onclick="selectProduct(this)">
+                                            <div class="item-name">Acetylcystein 200mg BH [A28]</div>
+                                            <div class="item-details">
+                                                Mã: HH000000020 | ĐVT nhập: Viên | SL09: 1 | Nhóm: DV - Nhóm thuốc dịch vụ | ĐVT xuất: Viên
+                                            </div>
+                                        </div>
+                                        <div class="autocomplete-item" onclick="selectProduct(this)">
+                                            <div class="item-name">Acetylcystein DV [AD]</div>
+                                            <div class="item-details">
+                                                Mã: HH00433 | ĐVT nhập: Viên | Nhóm: DV - Nhóm thuốc dịch vụ
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="product-detail">
+                                    <div class="detail-row">
+                                        <span class="detail-label">Mã:</span> HH000000020 |
+                                        <span class="detail-label">ĐVT nhập:</span> Viên |
+                                        <span class="detail-label">SL09:</span> 1
+                                    </div>
+                                    <div class="detail-row">
+                                        <span class="detail-label">Nhóm:</span> DV - Nhóm thuốc dịch vụ |
+                                        <span class="detail-label">ĐVT xuất:</span> Viên
+                                    </div>
+                                    <div class="detail-row">
+                                        <span class="detail-label">Hàm lượng:</span> 200mg |
+                                        <span class="detail-label">Hoạt chất:</span> Acetylcystein
+                                    </div>
+                                    <div class="detail-row">
+                                        <span class="detail-label">TT thầu:</span> |
+                                        <span class="detail-label">Số đăng ký:</span> |
+                                        <span class="detail-label">Giá thầu:</span>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="text-center">
+                                <input type="checkbox">
+                            </td>
+                            <td><input type="number" class="cell-input" value="50"></td>
+                            <td class="text-center">Viên</td>
+                            <td class="text-center">1</td>
+                            <td><input type="number" class="cell-input text-right" value="2000"></td>
+                            <td class="text-right">100,000</td>
+                            <td><input type="number" class="cell-input text-right" value="0"></td>
+                            <td class="text-right">100,000</td>
+                            <td>
+                                <select class="cell-select">
+                                    <option>-- Số lô --</option>
+                                </select>
+                            </td>
+                            <td><input type="text" class="cell-input"></td>
+                            <td><input type="date" class="cell-input"></td>
+                            <td><input type="date" class="cell-input"></td>
+                            <td><input type="text" class="cell-input"></td>
+                            <td class="text-center">
+                                <button class="btn-delete" onclick="deleteRow(this)">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="text-center">2</td>
+                            <td>
+                                <div class="product-autocomplete">
+                                    <input type="text" class="product-input" placeholder="-- Hàng hóa --" onfocus="showDropdown(this)">
+                                    <div class="autocomplete-dropdown"></div>
+                                </div>
+                            </td>
+                            <td class="text-center">
+                                <input type="checkbox">
+                            </td>
+                            <td><input type="number" class="cell-input" value="0"></td>
+                            <td class="text-center"></td>
+                            <td class="text-center"></td>
+                            <td><input type="number" class="cell-input text-right" value="0"></td>
+                            <td class="text-right">0</td>
+                            <td><input type="number" class="cell-input text-right" value="0"></td>
+                            <td class="text-right">0</td>
+                            <td>
+                                <select class="cell-select">
+                                    <option>-- Số lô --</option>
+                                </select>
+                            </td>
+                            <td><input type="text" class="cell-input"></td>
+                            <td><input type="date" class="cell-input"></td>
+                            <td><input type="date" class="cell-input"></td>
+                            <td><input type="text" class="cell-input"></td>
+                            <td class="text-center">
+                                <button class="btn-delete" onclick="deleteRow(this)">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Footer Summary -->
+            <div class="footer">
+                <div class="footer-item">
+                    <span class="footer-label">Tổng tiền hàng:</span>
+                    <div class="footer-value">100,000</div>
+                </div>
+                <div class="footer-item">
+                    <span class="footer-label">Tổng chiết khấu:</span>
+                    <div class="footer-value">0</div>
+                </div>
+                <div class="footer-item">
+                    <span class="footer-label">Tổng thuế:</span>
+                    <div class="footer-value">0</div>
+                </div>
+                <div class="footer-item">
+                    <span class="footer-label">Tổng cộng:</span>
+                    <div class="footer-value" style="color: #1976d2; font-weight: 700;">100,000</div>
+                </div>
+                <div class="footer-item">
+                    <span class="footer-label">Người lập phiếu:</span>
+                    <div class="footer-value">Admin</div>
+                </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="actions">
+                <button class="btn btn-clear">Xóa trắng</button>
+                <button class="btn btn-save">Lưu</button>
+            </div>
+        </div>
+
+        <!-- Tab Content 2: Danh Sách Phiếu -->
+        <div id="danhsach" class="tab-content">
+            <div class="list-header">
+                <h3 style="font-size: 16px; color: #333;">Danh sách phiếu nhập</h3>
+                <div class="search-box">
+                    <input type="text" class="search-input" placeholder="Tìm kiếm theo số phiếu, nhà cung cấp...">
+                    <input type="date" class="search-input" placeholder="Từ ngày">
+                    <input type="date" class="search-input" placeholder="Đến ngày">
+                    <button class="btn-search">
+                        <i class="fas fa-search"></i> Tìm kiếm
+                    </button>
+                </div>
+            </div>
+
+            <div class="list-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 40px;">STT</th>
+                            <th>Số phiếu</th>
+                            <th>Ngày lập</th>
+                            <th>Nhà cung cấp</th>
+                            <th>Số HĐ</th>
+                            <th>Tổng tiền</th>
+                            <th>Người lập</th>
+                            <th>Trạng thái</th>
+                            <th style="width: 120px;">Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="text-center">1</td>
+                            <td>PN001</td>
+                            <td>08/11/2025 09:58</td>
+                            <td>Nhà cung cấp A</td>
+                            <td>HD123456</td>
+                            <td class="text-right">100,000</td>
+                            <td>Admin</td>
+                            <td class="text-center">
+                                <span style="color: #4caf50; font-weight: 600;">Đã duyệt</span>
+                            </td>
+                            <td>
+                                <div class="action-btns">
+                                    <button class="action-btn">
+                                        <i class="fas fa-eye"></i> Xem
+                                    </button>
+                                    <button class="action-btn">
+                                        <i class="fas fa-edit"></i> Sửa
+                                    </button>
+                                    <button class="action-btn" style="color: #d32f2f;">
+                                        <i class="fas fa-trash"></i> Xóa
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="text-center">2</td>
+                            <td>PN002</td>
+                            <td>07/11/2025 14:30</td>
+                            <td>Nhà cung cấp B</td>
+                            <td>HD789012</td>
+                            <td class="text-right">250,000</td>
+                            <td>Admin</td>
+                            <td class="text-center">
+                                <span style="color: #ff9800; font-weight: 600;">Chờ duyệt</span>
+                            </td>
+                            <td>
+                                <div class="action-btns">
+                                    <button class="action-btn">
+                                        <i class="fas fa-eye"></i> Xem
+                                    </button>
+                                    <button class="action-btn">
+                                        <i class="fas fa-edit"></i> Sửa
+                                    </button>
+                                    <button class="action-btn" style="color: #d32f2f;">
+                                        <i class="fas fa-trash"></i> Xóa
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script src="~/js/phieunhap.js"></script>
+</body>
+</html>
