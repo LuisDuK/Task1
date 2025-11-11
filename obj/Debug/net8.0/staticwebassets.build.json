@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "Lktb1T+tobS0Vt5D1LFLlJ/GMilhmaiIVMQqgc5ESUo=",
+  "Hash": "vm4X1Xu3tdTMpYIRfoI536DCyl8Uv3TO/WWicp2toyw=",
   "Source": "QLHangHoa",
   "BasePath": "_content/QLHangHoa",
   "Mode": "Default",
@@ -93,6 +93,25 @@
       "OriginalItemSpec": "wwwroot\\css\\modal.css"
     },
     {
+      "Identity": "D:\\HocCsharp\\QLHangHoa\\QLHangHoa\\wwwroot\\css\\phieunhap.css",
+      "SourceId": "QLHangHoa",
+      "SourceType": "Discovered",
+      "ContentRoot": "D:\\HocCsharp\\QLHangHoa\\QLHangHoa\\wwwroot\\",
+      "BasePath": "_content/QLHangHoa",
+      "RelativePath": "css/phieunhap.css",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\css\\phieunhap.css"
+    },
+    {
       "Identity": "D:\\HocCsharp\\QLHangHoa\\QLHangHoa\\wwwroot\\css\\site.css",
       "SourceId": "QLHangHoa",
       "SourceType": "Discovered",
@@ -148,6 +167,25 @@
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot\\js\\hanghoa.js"
+    },
+    {
+      "Identity": "D:\\HocCsharp\\QLHangHoa\\QLHangHoa\\wwwroot\\js\\phieunhap.js",
+      "SourceId": "QLHangHoa",
+      "SourceType": "Discovered",
+      "ContentRoot": "D:\\HocCsharp\\QLHangHoa\\QLHangHoa\\wwwroot\\",
+      "BasePath": "_content/QLHangHoa",
+      "RelativePath": "js/phieunhap.js",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\js\\phieunhap.js"
     },
     {
       "Identity": "D:\\HocCsharp\\QLHangHoa\\QLHangHoa\\wwwroot\\js\\site.js",

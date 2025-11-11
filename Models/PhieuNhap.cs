@@ -61,4 +61,15 @@ namespace QLHangHoa.Models
 
         public ICollection<ChiTietPhieuNhap>? ChiTietPhieuNhaps { get; set; }
     }
+    public class PhieuNhapViewModel
+    {
+        public string SoHoaDon { get; set; }
+        public DateTime? NgayHoaDon { get; set; }
+        public string KyHieuHoaDon { get; set; }
+        public int NhaCungCapId { get; set; }
+        public string GhiChu { get; set; }
+        public string NguoiNhap { get; set; }
+
+        public List<ChiTietPhieuNhap> ChiTietPhieuNhaps { get; set; }
+    }
 }

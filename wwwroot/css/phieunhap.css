@@ -132,17 +132,19 @@ table {
     width: 100%;
     border-collapse: collapse;
     font-size: 12px;
+    border: 1px solid #797979;
 }
 
 thead {
     background: #f0f0f0;
     position: sticky;
     top: 0;
+    border: 1px solid #797979;
 }
 
 th {
     padding: 8px 5px;
-    border: 1px solid #ddd;
+    border: 1px solid #797979;
     font-weight: 600;
     text-align: center;
     font-size: 11px;
@@ -180,45 +182,7 @@ tbody tr:hover {
     background: transparent;
 }
 
-.product-autocomplete {
-    position: relative;
-}
 
-.product-input {
-    width: 100%;
-    padding: 4px;
-    border: 1px solid #ccc;
-    border-radius: 3px;
-    font-size: 12px;
-}
-
-.autocomplete-dropdown {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    background: white;
-    border: 1px solid #ccc;
-    max-height: 300px;
-    overflow-y: auto;
-    z-index: 1000;
-    display: none;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-}
-
-    .autocomplete-dropdown.show {
-        display: block;
-    }
-
-.autocomplete-item {
-    padding: 10px;
-    cursor: pointer;
-    border-bottom: 1px solid #eee;
-}
-
-    .autocomplete-item:hover {
-        background: #f0f0f0;
-    }
 
 .item-name {
     font-weight: 600;
@@ -349,14 +313,12 @@ input[type="checkbox"] {
 
 /* Danh sách phiếu */
 .list-header {
+    display:block;
+    gap: 20px;
     padding: 15px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: #f9f9f9;
+    background: #fff9e6;
     border-bottom: 1px solid #ddd;
 }
-
 .search-box {
     display: flex;
     gap: 10px;

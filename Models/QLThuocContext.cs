@@ -403,13 +403,15 @@ public partial class QLThuocContext : DbContext
             entity.Property(e => e.ChietKhau)
                   .HasColumnName("chiet_khau")
                   .HasColumnType("decimal(5,2)")
-                  .HasDefaultValue(0);
+                   .HasDefaultValue(0m);
 
             entity.Property(e => e.Vat)
                   .HasColumnName("vat")
                   .HasColumnType("decimal(5,2)")
-                  .HasDefaultValue(0);
-
+                  .HasDefaultValue(0m);
+            entity.Property(e => e.TrangThai)
+                .HasColumnName("trang_thai")
+                .HasDefaultValue((byte)1);
             entity.Property(e => e.NgaySanXuat).HasColumnName("ngay_san_xuat");
             entity.Property(e => e.HanSuDung).HasColumnName("han_su_dung");
 

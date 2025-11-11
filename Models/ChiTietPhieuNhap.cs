@@ -29,10 +29,10 @@ namespace QLHangHoa.Models
         public decimal DonGiaNhap { get; set; }
 
         [Column("chiet_khau", TypeName = "decimal(5,2)")]
-        public decimal? ChietKhau { get; set; } = 0;
+        public decimal? ChietKhau { get; set; } = 0m;
 
         [Column("vat", TypeName = "decimal(5,2)")]
-        public decimal? Vat { get; set; } = 0;
+        public decimal? Vat { get; set; } = 0m;
 
         [Column("ngay_san_xuat")]
         public DateTime? NgaySanXuat { get; set; }
@@ -44,6 +44,8 @@ namespace QLHangHoa.Models
         [StringLength(100)]
         public string? SoLo { get; set; }
 
+        [Column("trang_thai")]
+        public byte TrangThai { get; set; } = 1;
         [Column("ghi_chu")]
         [StringLength(255)]
         public string? GhiChu { get; set; }

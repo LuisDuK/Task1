@@ -10,6 +10,71 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="~/css/phieunhap.css" />
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" defer></script>
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" ></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js" defer ></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.8/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="~/css/modal.css" />
+    <style>
+        .select2-results__option strong {
+            color: #000;
+        }
+
+        .select2-results__option small {
+            color: #777;
+            float: right;
+        }
+
+        .select2-results__option {
+            padding: 8px 10px !important;
+        }
+
+        .hanghoa-item {
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+            align-items: flex-start;
+            width: 100%;
+        }
+
+            .hanghoa-item .left-col {
+                flex: 1.3;
+                min-width: 250px;
+            }
+
+            .hanghoa-item .right-col {
+                flex: 1;
+                font-size: 12px;
+                color: #555;
+                line-height: 1.3em;
+                min-width: 280px;
+            }
+
+            .hanghoa-item .tenhang {
+                font-size: 14px;
+                color: #000;
+                margin-bottom: 2px;
+            }
+
+            .hanghoa-item .subtext {
+                font-size: 12px;
+                color: #666;
+            }
+
+        /* Khi hover */
+        .select2-results__option--highlighted {
+            background-color: #eef6ff !important;
+            color: #000 !important;
+        }
+
+        /* Dropdown rộng hơn */
+        .select2-container .select2-dropdown {
+            width: auto !important;
+            min-width: 600px !important;
+            max-width: 900px;
+        }
+
+    </style>
 </head>
 <body>
     <div class="container">
@@ -18,19 +83,12 @@
             <div class="top-bar-group">
                 <label class="top-bar-label">Kho:</label>
                 <select class="top-bar-select">
-                    <option selected>Kho Thuốc Dịch Vụ</option>
-                    <option>Kho Thuốc BHYT</option>
-                    <option>Kho Vật Tư</option>
                 </select>
             </div>
 
             <div class="top-bar-group">
                 <label class="top-bar-label">Nguồn nhập/xuất:</label>
                 <select class="top-bar-select">
-                    <option value="">-- Chọn nguồn --</option>
-                    <option>Nhập từ nhà cung cấp</option>
-                    <option>Nhập từ kho khác</option>
-                    <option>Xuất bán</option>
                 </select>
             </div>
         </div>
@@ -61,162 +119,65 @@
 
                 <div class="form-group" style="grid-column: span 3 ;">
                     <label class="form-label">Nơi cung cấp: <span style="color: red;">*</span></label>
-                    <select class="form-select">
+                    <select class="form-select" name="NoiCungCap">
                         <option>-- Nơi cung cấp --</option>
                     </select>
                 </div>
 
                 <div class="form-group">
                     <label class="form-label">Số HĐ:</label>
-                    <input type="text" class="form-input" placeholder="Số hóa đơn">
+                    <input type="text" id="soHoaDon" class="form-input" placeholder="Số hóa đơn">
                 </div>
 
                 <div class="form-group">
                     <label class="form-label">Ngày HĐ:</label>
-                    <input type="date" class="form-input">
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Nhập hàng từ nhà cung cấp:</label>
-                    <select class="form-select">
-                        <option>-- Chọn nhà cung cấp --</option>
-                    </select>
+                    <input type="date" id="ngayHoaDon" class="form-input">
                 </div>
 
                 <div class="form-group" >
                     <label class="form-label">Kỳ hiệu HĐ:</label>
-                    <input type="text" class="form-input">
+                    <input type="text" id="kyHieuHoaDon" class="form-input">
                 </div>
 
                 <div class="form-group">
                     <label class="form-label">Ghi chú:</label>
-                    <input type="text" class="form-input">
+                    <input type="text" id="ghiChu" class="form-input">
                 </div>
             </div>
 
             <!-- Table -->
             <div class="table-wrapper">
-                <table>
+                <table id="tableChiTiet">
                     <thead>
                         <tr>
-                            <th style="width: 30px;">TT</th>
-                            <th style="width: 250px;">Tên hàng hóa</th>
-                            <th style="width: 40px;">Chi phân thuốc BH</th>
-                            <th style="width: 60px;">SL nhập</th>
-                            <th style="width: 60px;">ĐVT nhập</th>
-                            <th style="width: 60px;">SL quy đổi</th>
-                            <th style="width: 80px;">Giá nhập</th>
-                            <th style="width: 90px;">Thành tiền</th>
-                            <th style="width: 70px;">chiết khấu %</th>
-                            <th style="width: 80px;">Số tiền</th>
-                            <th style="width: 60px;">VAT</th>
-                            <th style="width: 100px;">Số lô</th>
-                            <th style="width: 90px;">Ngày SX</th>
-                            <th style="width: 90px;">Hạn SD</th>
-                            <th style="width: 100px;">Ghi chú</th>
-                            <th style="width: 40px;"></th>
+
+                            <th rowspan="2" style="width: 30px;">TT</th>
+                            <th rowspan="2" style="width: 250px;">
+                                Tên hàng hóa <div class="form-check form-switch" style="float:right;">
+                                    <input class="form-check-input" type="checkbox" id="toggleBHYT">
+                                    <label class="form-check-label" for="toggleBHYT">Chỉ BHYT</label>
+                                </div>
+                            </th>
+                            <th rowspan="2" style="width: 60px;">SL nhập</th>
+                            <th rowspan="2" style="width: 60px;">ĐVT nhập</th>
+                            <th rowspan="2" style="width: 60px;">SL quy đổi</th>
+                            <th rowspan="2" style="width: 80px;">Giá nhập</th>
+                            <th rowspan="2" style="width: 90px;">Thành tiền</th>
+                            <th colspan="2" style="width: 150px; text-align:center;">Chiết khấu</th>
+                            <th rowspan="2" style="width: 90px;">VAT</th>
+                            <th rowspan="2" style="width: 100px;">Số lô</th>
+                            <th rowspan="2" style="width: 90px;">Ngày SX</th>
+                            <th rowspan="2" style="width: 90px;">Hạn SD</th>
+                            <th rowspan="2" style="width: 100px;">Ghi chú</th>
+                            <th rowspan="2" style="width: 40px;"></th>
+                        </tr>
+                        <tr>
+                            <th style="width: 70px; text-align:center;">%</th>
+                            <th style="width: 80px; text-align:center;">Số tiền</th>
                         </tr>
                     </thead>
                     <tbody id="tableBody">
-                        <tr>
-                            <td class="text-center">1</td>
-                            <td>
-                                <div class="product-autocomplete">
-                                    <input type="text" class="product-input" value="Acetylcystein 200mg BH" onfocus="showDropdown(this)" oninput="filterProducts(this)">
-                                    <div class="autocomplete-dropdown">
-                                        <div class="autocomplete-item" onclick="selectProduct(this)">
-                                            <div class="item-name">Acetylcystein 200mg BH [A28]</div>
-                                            <div class="item-details">
-                                                Mã: HH000000020 | ĐVT nhập: Viên | SL09: 1 | Nhóm: DV - Nhóm thuốc dịch vụ | ĐVT xuất: Viên
-                                            </div>
-                                        </div>
-                                        <div class="autocomplete-item" onclick="selectProduct(this)">
-                                            <div class="item-name">Acetylcystein DV [AD]</div>
-                                            <div class="item-details">
-                                                Mã: HH00433 | ĐVT nhập: Viên | Nhóm: DV - Nhóm thuốc dịch vụ
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="product-detail">
-                                    <div class="detail-row">
-                                        <span class="detail-label">Mã:</span> HH000000020 |
-                                        <span class="detail-label">ĐVT nhập:</span> Viên |
-                                        <span class="detail-label">SL09:</span> 1
-                                    </div>
-                                    <div class="detail-row">
-                                        <span class="detail-label">Nhóm:</span> DV - Nhóm thuốc dịch vụ |
-                                        <span class="detail-label">ĐVT xuất:</span> Viên
-                                    </div>
-                                    <div class="detail-row">
-                                        <span class="detail-label">Hàm lượng:</span> 200mg |
-                                        <span class="detail-label">Hoạt chất:</span> Acetylcystein
-                                    </div>
-                                    <div class="detail-row">
-                                        <span class="detail-label">TT thầu:</span> |
-                                        <span class="detail-label">Số đăng ký:</span> |
-                                        <span class="detail-label">Giá thầu:</span>
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="text-center">
-                                <input type="checkbox">
-                            </td>
-                            <td><input type="number" class="cell-input" value="50"></td>
-                            <td class="text-center">Viên</td>
-                            <td class="text-center">1</td>
-                            <td><input type="number" class="cell-input text-right" value="2000"></td>
-                            <td class="text-right">100,000</td>
-                            <td><input type="number" class="cell-input text-right" value="0"></td>
-                            <td class="text-right">100,000</td>
-                            <td>
-                                <select class="cell-select">
-                                    <option>-- Số lô --</option>
-                                </select>
-                            </td>
-                            <td><input type="text" class="cell-input"></td>
-                            <td><input type="date" class="cell-input"></td>
-                            <td><input type="date" class="cell-input"></td>
-                            <td><input type="text" class="cell-input"></td>
-                            <td class="text-center">
-                                <button class="btn-delete" onclick="deleteRow(this)">
-                                    <i class="fas fa-times"></i>
-                                </button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="text-center">2</td>
-                            <td>
-                                <div class="product-autocomplete">
-                                    <input type="text" class="product-input" placeholder="-- Hàng hóa --" onfocus="showDropdown(this)">
-                                    <div class="autocomplete-dropdown"></div>
-                                </div>
-                            </td>
-                            <td class="text-center">
-                                <input type="checkbox">
-                            </td>
-                            <td><input type="number" class="cell-input" value="0"></td>
-                            <td class="text-center"></td>
-                            <td class="text-center"></td>
-                            <td><input type="number" class="cell-input text-right" value="0"></td>
-                            <td class="text-right">0</td>
-                            <td><input type="number" class="cell-input text-right" value="0"></td>
-                            <td class="text-right">0</td>
-                            <td>
-                                <select class="cell-select">
-                                    <option>-- Số lô --</option>
-                                </select>
-                            </td>
-                            <td><input type="text" class="cell-input"></td>
-                            <td><input type="date" class="cell-input"></td>
-                            <td><input type="date" class="cell-input"></td>
-                            <td><input type="text" class="cell-input"></td>
-                            <td class="text-center">
-                                <button class="btn-delete" onclick="deleteRow(this)">
-                                    <i class="fas fa-times"></i>
-                                </button>
-                            </td>
-                        </tr>
+                      
                     </tbody>
                 </table>
             </div>
@@ -225,7 +186,7 @@
             <div class="footer">
                 <div class="footer-item">
                     <span class="footer-label">Tổng tiền hàng:</span>
-                    <div class="footer-value">100,000</div>
+                    <div class="footer-value">0</div>
                 </div>
                 <div class="footer-item">
                     <span class="footer-label">Tổng chiết khấu:</span>
@@ -237,7 +198,7 @@
                 </div>
                 <div class="footer-item">
                     <span class="footer-label">Tổng cộng:</span>
-                    <div class="footer-value" style="color: #1976d2; font-weight: 700;">100,000</div>
+                    <div class="footer-value" style="color: #1976d2; font-weight: 700;">0</div>
                 </div>
                 <div class="footer-item">
                     <span class="footer-label">Người lập phiếu:</span>
@@ -247,96 +208,109 @@
 
             <!-- Actions -->
             <div class="actions">
-                <button class="btn btn-clear">Xóa trắng</button>
-                <button class="btn btn-save">Lưu</button>
+                <button class="btn btn-clear" onclick="clearForm()">Xóa trắng</button>
+                <button class="btn btn-save" onclick="savePhieuNhap()">Lưu</button>
             </div>
         </div>
 
         <!-- Tab Content 2: Danh Sách Phiếu -->
         <div id="danhsach" class="tab-content">
-            <div class="list-header">
-                <h3 style="font-size: 16px; color: #333;">Danh sách phiếu nhập</h3>
-                <div class="search-box">
-                    <input type="text" class="search-input" placeholder="Tìm kiếm theo số phiếu, nhà cung cấp...">
-                    <input type="date" class="search-input" placeholder="Từ ngày">
-                    <input type="date" class="search-input" placeholder="Đến ngày">
-                    <button class="btn-search">
-                        <i class="fas fa-search"></i> Tìm kiếm
+            <div class="list-header" >
+
+                <div class="filter" style="display: grid; gap: 10px;
+    grid-template-columns: repeat(4, 1fr);">
+                    <div class="filter-group">
+                        <label class="filter-label">Từ ngày:</label>
+                        <input type="date" class="filter-input" value="2025-11-08">
+                    </div>
+                    <div class="filter-group">
+                        <label class="filter-label">Đến ngày:</label>
+                        <input type="date" class="filter-input" value="2025-11-08">
+                    </div>
+                    <div class="filter-group" style="grid-column: span 2;">
+                        <label class="filter-label">Nơi cung cấp:</label>
+                    <select class="filter-select" name="NoiCungCap2">
+                            <option>-- Nơi cung cấp --</option>
+                        </select>
+                    </div>
+                </div>
+          
+                <div class="filter" style="gap: 10px; display:flex; padding:5px;">
+                    <div class="filter-group" style="min-width:40%;">
+                        <label class="filter-label">Hàng hóa:</label>
+                        <select class="filter-select" style="  width: 400px;" id="filterHangHoa">
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label class="filter-label">Số phiếu:</label>
+                        <input type="text" class="filter-input" placeholder="Số phiếu">
+                    </div>
+                    <div class="filter-group">
+                        <label class="filter-label">Số HĐ:</label>
+                        <input type="text" class="filter-input" placeholder="Số hóa đơn">
+                    </div>
+                    <button class="btn-search-icon">
+                        <i class="fas fa-search"></i>
                     </button>
                 </div>
             </div>
 
             <div class="list-table">
-                <table>
+                <table id="tableDanhSachPhieu">
                     <thead>
                         <tr>
-                            <th style="width: 40px;">STT</th>
-                            <th>Số phiếu</th>
-                            <th>Ngày lập</th>
-                            <th>Nhà cung cấp</th>
-                            <th>Số HĐ</th>
-                            <th>Tổng tiền</th>
-                            <th>Người lập</th>
-                            <th>Trạng thái</th>
+                            <th style="width: 30px;">#</th>
+                            <th style="width: 120px;">Số hóa đơn</th>
+                            <th style="width: 120px;">Ngày hóa đơn</th>
+                            <th style="width: 140px;">Ngày nhập</th>
+                            <th style="width: 150px;">Nhà CC</th>
+                            <th style="width: 80px;">∑ Hàng</th>
+                            <th style="width: 80px;">∑ CK</th>
+                            <th style="width: 80px;">∑ VAT</th>
+                            <th style="width: 100px;">∑ Tổng</th>
+                            <th style="width: 100px;">Người lập</th>
+                            <th style="width: 120px;">Số phiếu</th>
                             <th style="width: 120px;">Thao tác</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        <tr>
-                            <td class="text-center">1</td>
-                            <td>PN001</td>
-                            <td>08/11/2025 09:58</td>
-                            <td>Nhà cung cấp A</td>
-                            <td>HD123456</td>
-                            <td class="text-right">100,000</td>
-                            <td>Admin</td>
-                            <td class="text-center">
-                                <span style="color: #4caf50; font-weight: 600;">Đã duyệt</span>
-                            </td>
-                            <td>
-                                <div class="action-btns">
-                                    <button class="action-btn">
-                                        <i class="fas fa-eye"></i> Xem
-                                    </button>
-                                    <button class="action-btn">
-                                        <i class="fas fa-edit"></i> Sửa
-                                    </button>
-                                    <button class="action-btn" style="color: #d32f2f;">
-                                        <i class="fas fa-trash"></i> Xóa
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="text-center">2</td>
-                            <td>PN002</td>
-                            <td>07/11/2025 14:30</td>
-                            <td>Nhà cung cấp B</td>
-                            <td>HD789012</td>
-                            <td class="text-right">250,000</td>
-                            <td>Admin</td>
-                            <td class="text-center">
-                                <span style="color: #ff9800; font-weight: 600;">Chờ duyệt</span>
-                            </td>
-                            <td>
-                                <div class="action-btns">
-                                    <button class="action-btn">
-                                        <i class="fas fa-eye"></i> Xem
-                                    </button>
-                                    <button class="action-btn">
-                                        <i class="fas fa-edit"></i> Sửa
-                                    </button>
-                                    <button class="action-btn" style="color: #d32f2f;">
-                                        <i class="fas fa-trash"></i> Xóa
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
+                    <tbody id="tbodyPhieuNhap">
+            
+                
                     </tbody>
                 </table>
             </div>
         </div>
+        <div class="modal-overlay" id="notifyOverlay" style="display:none">
+            <div class="modal-phieu" style="max-width:400px;">
+                <div class="modal-header">
+                    <h2 class="modal-title" id="notifyTitle">Thông báo</h2>
+                    <button class="close-btn" onclick="closeNotifyModal()">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <p id="notifyMessage">...</p>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-primary" onclick="closeNotifyModal()">Đóng</button>
+                </div>
+            </div>
+        </div>
     </div>
+   
+    <script>
+        const nhaCungCapData = @Html.Raw(ViewBag.NhaCungCapJson ?? "[]");
+        const hangHoaData = @Html.Raw(ViewBag.HangHoaJson ?? "[]");
+        let rowIndex = 0;
+        let chiChonBHYT = false;
+        var phieuNhapData = @Html.Raw(ViewBag.PhieuNhapJson);
+        document.addEventListener("DOMContentLoaded", function () {
+
+            var success = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(TempData["Success"]));
+            var error = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(TempData["Error"]));
+
+            if (success) { showSuccess(success); }
+            if (error) { showError(error); }
+        });
+    </script>
 
     <script src="~/js/phieunhap.js"></script>
 </body>
