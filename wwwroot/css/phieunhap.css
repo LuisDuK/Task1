@@ -128,36 +128,38 @@ body {
     min-height: 300px;
 }
 
-table {
+#tableChiTiet  {
     width: 100%;
     border-collapse: collapse;
     font-size: 12px;
     border: 1px solid #797979;
 }
 
-thead {
+#tableChiTiet thead {
     background: #f0f0f0;
     position: sticky;
     top: 0;
     border: 1px solid #797979;
 }
-
-th {
-    padding: 8px 5px;
+#tableChiTiet tr {
     border: 1px solid #797979;
+}
+#tableChiTiet th {
+    padding: 8px 5px;
+    border: 1px solid black;
     font-weight: 600;
     text-align: center;
     font-size: 11px;
     white-space: nowrap;
 }
 
-td {
+#tableChiTiet td {
     padding: 4px 5px;
     border: 1px solid #ddd;
     vertical-align: top;
 }
 
-tbody tr:hover {
+#tableChiTiet tbody tr:hover {
     background: #f9f9f9;
 }
 
@@ -182,40 +184,6 @@ tbody tr:hover {
     background: transparent;
 }
 
-
-
-.item-name {
-    font-weight: 600;
-    color: #333;
-    margin-bottom: 4px;
-}
-
-.item-details {
-    font-size: 11px;
-    color: #666;
-}
-
-.product-detail {
-    background: #f9f9f9;
-    padding: 8px;
-    margin-top: 5px;
-    font-size: 11px;
-    border-radius: 3px;
-    display: none;
-}
-
-    .product-detail.show {
-        display: block;
-    }
-
-.detail-row {
-    margin-bottom: 3px;
-}
-
-.detail-label {
-    font-weight: 600;
-    color: #555;
-}
 
 .btn-delete {
     background: none;

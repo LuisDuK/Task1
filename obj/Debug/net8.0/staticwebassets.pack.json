@@ -29,6 +29,10 @@
       "PackagePath": "staticwebassets\\js\\hanghoa.js"
     },
     {
+      "Id": "D:\\HocCsharp\\QLHangHoa\\QLHangHoa\\wwwroot\\js\\modal.js",
+      "PackagePath": "staticwebassets\\js\\modal.js"
+    },
+    {
       "Id": "D:\\HocCsharp\\QLHangHoa\\QLHangHoa\\wwwroot\\js\\phieunhap.js",
       "PackagePath": "staticwebassets\\js\\phieunhap.js"
     },

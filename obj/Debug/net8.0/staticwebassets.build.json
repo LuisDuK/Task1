@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "vm4X1Xu3tdTMpYIRfoI536DCyl8Uv3TO/WWicp2toyw=",
+  "Hash": "cbe7juhYpR15OpiMpiIWfViMxXt/qTxCUNVtXXEQOF0=",
   "Source": "QLHangHoa",
   "BasePath": "_content/QLHangHoa",
   "Mode": "Default",
@@ -167,6 +167,25 @@
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot\\js\\hanghoa.js"
+    },
+    {
+      "Identity": "D:\\HocCsharp\\QLHangHoa\\QLHangHoa\\wwwroot\\js\\modal.js",
+      "SourceId": "QLHangHoa",
+      "SourceType": "Discovered",
+      "ContentRoot": "D:\\HocCsharp\\QLHangHoa\\QLHangHoa\\wwwroot\\",
+      "BasePath": "_content/QLHangHoa",
+      "RelativePath": "js/modal.js",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\js\\modal.js"
     },
     {
       "Identity": "D:\\HocCsharp\\QLHangHoa\\QLHangHoa\\wwwroot\\js\\phieunhap.js",

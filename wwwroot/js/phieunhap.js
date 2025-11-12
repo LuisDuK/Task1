@@ -19,9 +19,6 @@ function showDropdown(input) {
     dropdown.classList.add('show');
 }
 
-function filterProducts(input) {
-    // Logic tìm kiếm
-}
 document.addEventListener('DOMContentLoaded', function () {
     initDropdowns();
     addNewRow(); // dòng đầu tiên
@@ -76,21 +73,20 @@ function addNewRow() {
                         
                         <td><input type="number" class="cell-input text-right tdVat"
                                                    name="ChiTietPhieuNhap[${rowIndex}].Vat" ></td>
-                                <td>
+                        <td>
                             <select class="cell-select"
                                     name="ChiTietPhieuNhap[${rowIndex}].SoLo">
                                 <option>-- Số lô --</option>
                             </select>
                         </td>
-                        <td><input type="text" class="cell-input"
-                                   name="ChiTietPhieuNhap[${rowIndex}].GhiChu"></td>
                         <td><input type="date" class="cell-input"
                                    name="ChiTietPhieuNhap[${rowIndex}].NgaySanXuat"></td>
                         <td><input type="date" class="cell-input"
                                    name="ChiTietPhieuNhap[${rowIndex}].HanSuDung"></td>
                         <td><input type="text" class="cell-input"
-                                   name="ChiTietPhieuNhap[${rowIndex}].GhiChuKhac"></td>
-                        <td class="text-center">
+                                   name="ChiTietPhieuNhap[${rowIndex}].GhiChuKhac"> 
+                        </td>
+                        <td >
                             <button type="button" class="btn-delete" onclick="deleteRow(this)">
                                 <i class="fas fa-times"></i>
                             </button>
@@ -307,7 +303,7 @@ function clearForm() {
     updateFooterTotals();
 
 }
-let notifyTimer = null;
+
 async function savePhieuNhap() {
     const chiTiet = [];
 
@@ -421,36 +417,3 @@ phieuNhapData.forEach((p, index) => {
                 `;
     tbody.appendChild(tr);
 });
-function showNotifyModal({ type = "success", title = "Thành công", message = "", duration = 4000 } = {}) {
-    const overlay = document.getElementById("notifyOverlay");
-    const titleEl = document.getElementById("notifyTitle");
-    const msgEl = document.getElementById("notifyMessage");
-
-    overlay.classList.remove("notify-success", "notify-error", "notify-info");
-    overlay.classList.add(type === "error" ? "notify-error" : type === "info" ? "notify-info" : "notify-success");
-
-    titleEl.textContent = title;
-    msgEl.textContent = message;
-   
-    overlay.style.display = "flex";
-
-    // auto close
-    clearTimeout(notifyTimer);
-    if (duration && duration > 0) {
-        notifyTimer = setTimeout(closeNotifyModal, duration);
-    }
-}
-// Hàm tắt thông báo
-function closeNotifyModal() {
-    const overlay = document.getElementById("notifyOverlay");
-    overlay.style.display = "none";
-    clearTimeout(notifyTimer);
-}
-// đóng bằng ESC hoặc click ra ngoài
-document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeNotifyModal(); });
-document.getElementById("notifyOverlay").addEventListener("click", (e) => {
-    if (e.target.id === "notifyOverlay") closeNotifyModal();
-});
-function showSuccess(msg) { showNotifyModal({ type: "success", title: "Thành công", message: msg }); }
-function showError(msg) { showNotifyModal({ type: "error", title: "Có lỗi", message: msg, duration: 4000 }); }
-function showInfo(msg) { showNotifyModal({ type: "info", title: "Thông báo", message: msg }); }
