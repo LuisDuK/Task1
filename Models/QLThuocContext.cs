@@ -423,6 +423,11 @@ public partial class QLThuocContext : DbContext
                   .WithMany(p => p.ChiTietPhieuNhaps)
                   .HasForeignKey(e => e.PhieuNhapId)
                   .OnDelete(DeleteBehavior.Cascade);
+            entity.HasOne(e => e.HangHoa)
+                  .WithMany()
+                  .HasForeignKey(e => e.HangHoaId)
+                  .OnDelete(DeleteBehavior.Restrict);
+
         });
         OnModelCreatingPartial(modelBuilder);
     }

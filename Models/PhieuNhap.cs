@@ -63,6 +63,7 @@ namespace QLHangHoa.Models
     }
     public class PhieuNhapViewModel
     {
+        public int? PhieuNhapId { get; set; }
         public string SoHoaDon { get; set; }
         public DateTime? NgayHoaDon { get; set; }
         public string KyHieuHoaDon { get; set; }

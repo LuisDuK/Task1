@@ -15,7 +15,7 @@ namespace QLHangHoa.Models
         public int PhieuNhapId { get; set; }
 
         [Column("hang_hoa_id")]
-        public int HangHoaId { get; set; }
+        public long HangHoaId { get; set; }
 
         [Required]
         [Column("so_luong", TypeName = "decimal(18,3)")]
@@ -64,6 +64,8 @@ namespace QLHangHoa.Models
                 return SoLuong * DonGiaNhap * (1 - ck) * (1 + vat);
             }
         }
+ 
+        public HangHoa HangHoa { get; set; }
     }
 
 }

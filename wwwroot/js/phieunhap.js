@@ -11,14 +11,34 @@
 
     // Hiện tab được chọn
     document.getElementById(tabName).classList.add('active');
-    event.target.closest('.tab').classList.add('active');
-}
 
+    // Thêm active vào tab tương ứng
+    const button = document.querySelector(`.tab[onclick="switchTab('${tabName}')"]`);
+    if (button) button.classList.add('active');
+
+    if (tabName === 'danhsach') {
+        resetPhieuNhapForm();
+    }
+}
+function resetPhieuNhapForm() {
+    $('#tableChiTiet #tableBody').empty();
+    rowIndex = 0;
+    addNewRow();
+    updateFooterTotals();
+
+    // Reset thông tin header nếu bạn muốn
+    $('#soHoaDon').val('');
+    $('#ngayHoaDon').val('');
+    $('#kyHieuHoaDon').val('');
+    $('#ghiChu').val('');
+    $('select[name="NoiCungCap"]').val('').trigger('change');
+    $('#phieuNhapId').val(''); // đang không chỉnh sửa nữa
+    $('#soPhieu').val('Auto');
+}
 function showDropdown(input) {
     const dropdown = input.nextElementSibling;
     dropdown.classList.add('show');
 }
-
 document.addEventListener('DOMContentLoaded', function () {
     initDropdowns();
     addNewRow(); // dòng đầu tiên
@@ -246,6 +266,7 @@ function updateFooterTotals() {
 }
 // TỰ THÊM DÒNG MỚI
 function addIfLastRow($row) {
+    if (isLoadingPhieu) return; // đang load dữ liệu -> không auto thêm dòng
     const $last = $('#tableChiTiet #tableBody tr:last');
     if ($row.is($last)) addNewRow();
 }
@@ -272,7 +293,6 @@ function deleteRow(btn) {
     // Cập nhật lại tổng tiền ở footer
     updateFooterTotals();
 }
-
 function updateRowIndex() {
     rowIndex = 0;
     $('#tableChiTiet #tableBody tr').each(function () {
@@ -328,7 +348,7 @@ async function savePhieuNhap() {
             SoLuong: parseFloat($(this).find('.tdSoLuong').val()) || 0,
             SoLuongQuyDoi: parseFloat($(this).find('.tdSlqd').text()) || null,
             DonGiaNhap: parseFloat($(this).find('.tdDonGia').val()) || 0,
-            ChietKhauPhanTram: parseFloat($(this).find('.tdChietKhauPhanTram').val()) || 0,
+            ChietKhau: parseFloat($(this).find('.tdChietKhauPhanTram').val()) || 0,
             ChietKhauSoTien: parseFloat($(this).find('.tdChietKhauSoTien').val()) || 0,
             Vat: parseFloat($(this).find('.tdVat').val()) || 0,
             NgaySanXuat: $(this).find('input[name*="NgaySanXuat"]').val() || null,
@@ -344,6 +364,7 @@ async function savePhieuNhap() {
     }
 
     const phieuNhap = {
+        PhieuNhapId: $('#phieuNhapId').val() ? parseInt($('#phieuNhapId').val()) : null,
         SoHoaDon: $('#soHoaDon').val(),
         NgayHoaDon: $('#ngayHoaDon').val(),
         KyHieuHoaDon: $('#kyHieuHoaDon').val(),
@@ -369,6 +390,10 @@ async function savePhieuNhap() {
         showError('Lưu phiếu thất bại thất bại');
     }
 }
+
+
+
+
 // Tab2
 
 const $filterHangHoa = $('#filterHangHoa');
@@ -409,11 +434,201 @@ phieuNhapData.forEach((p, index) => {
                     <td>${p.NguoiNhap}</td>
                     <td>${p.MaPhieuNhap}</td>
                     <td class="text-center">
-                        <button class="action-icon-btn" title="Xem"><i class="fas fa-edit"></i></button>
-                        <button class="action-icon-btn" title="In"><i class="fas fa-print"></i></button>
-                        <button class="action-icon-btn" title="Sao chép"><i class="fas fa-copy"></i></button>
-                        <button class="action-icon-btn delete" title="Xóa"><i class="fas fa-trash"></i></button>
+                        <!-- In PDF -->
+                        <button class="action-icon-btn btn-in-pdf" data-id="${p.PhieuNhapId}" title="In PDF" onclick="exportPdf(${p.PhieuNhapId})">
+                            <i class="fas fa-file-pdf"></i>
+                        </button>
+
+                        <!-- In Excel -->
+                        <button class="action-icon-btn btn-in-excel" data-id="${p.PhieuNhapId}" title="In Excel" onclick="exportExcel(${p.PhieuNhapId})">
+                            <i class="fas fa-file-excel"></i>
+                        </button>
+
+                        <!-- Chỉnh sửa -->
+                        <button class="action-icon-btn btn-edit" data-id="${p.PhieuNhapId}" title="Chỉnh sửa">
+                            <i class="fas fa-edit"></i>
+                        </button>
+
+                        <!-- Xóa -->
+                        <button class="action-icon-btn btn-delete" data-id="${p.PhieuNhapId}" title="Xóa" onclick="openConfirmDeleteModal(${p.PhieuNhapId})">
+                            <i class="fas fa-trash"></i>
+                        </button>
+
                     </td>
                 `;
     tbody.appendChild(tr);
 });
+// EXPORT PDF
+function exportPdf(phieuNhapId) {
+
+    fetch('/PhieuNhapKho/ExportPdf', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ id: phieuNhapId })
+    })
+        .then(response => {
+            if (!response.ok) throw new Error("Xuất PDF thất bại");
+            console.log(response);
+            return response.blob();
+        })
+        .then(blob => {
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `PhieuNhap_${phieuNhapId}.pdf`;
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+
+            showSuccess("Đã xuất PDF thành công!");
+        })
+        .catch(err => {
+            console.error(err);
+            showError("Lỗi khi xuất PDF: " + err.message);
+        });
+}
+// EXPORT PDF
+function exportExcel(phieuNhapId) {
+
+    fetch('/PhieuNhapKho/ExportExcel', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ id: phieuNhapId })
+    })
+        .then(response => {
+            if (!response.ok) throw new Error("Xuất Excel thất bại");
+            return response.blob();
+        })
+        .then(blob => {
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `PhieuNhap_${phieuNhapId}.xlsx`;
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+
+            showSuccess("Đã xuất Excel thành công!");
+        })
+        .catch(err => {
+            console.error(err);
+            showError("Lỗi khi xuất Excel: " + err.message);
+        });
+}
+
+function deletePhieuNhap(phieuNhapId) {
+    closeConfirmDeleteModal();
+    fetch(`/PhieuNhapKho/DeletePhieuNhap`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: phieuNhapId })
+    })
+        .then(response => {
+            if (!response.ok) throw new Error("Xóa thất bại");
+            return response.json();
+        })
+        .then(data => {
+            alert(data.message);
+            // Reload hoặc remove row khỏi bảng
+            location.reload();
+        })
+        .catch(err => {
+            console.error(err);
+            alert("Lỗi: " + err.message);
+        });
+}
+function openConfirmDeleteModal(phieuNhapId) {
+    // Lưu ID vào button
+    $('#btnConfirmDelete').data('id', phieuNhapId);
+
+    // Hiện modal
+    $('#confirmDeleteOverlay').fadeIn(150);
+}
+
+function closeConfirmDeleteModal() {
+    $('#confirmDeleteOverlay').fadeOut(150);
+}
+$('#btnConfirmDelete').on('click', function () {
+    const id = $(this).data('id');
+    deletePhieuNhap(id);
+});
+let editingPhieuId = null;
+let isLoadingPhieu = false;
+$(document).on('click', '.btn-edit', function () {
+    const id = $(this).data('id');
+    loadPhieuNhapForEdit(id);
+});
+async function loadPhieuNhapForEdit(id) {
+    try {
+        const res = await fetch(`/PhieuNhapKho/GetPhieuNhap?id=${id}`);
+        if (!res.ok) {
+            showError('Không tải được phiếu nhập');
+            return;
+        }
+        const data = await res.json();
+    
+        // set trạng thái đang chỉnh sửa
+        editingPhieuId = data.phieuNhapId || data.PhieuNhapId;
+        $('#phieuNhapId').val(editingPhieuId);
+
+        // header
+        $('#soPhieu').val(data.maPhieuNhap || data.MaPhieuNhap || ''); // hiển thị mã phiếu
+        $('#soHoaDon').val(data.soHoaDon || data.SoHoaDon || '');
+        $('#ngayHoaDon').val(data.ngayHoaDon ? data.ngayHoaDon.substring(0, 10) : '');
+        $('#kyHieuHoaDon').val(data.kyHieuHoaDon || data.KyHieuHoaDon || '');
+        $('#ghiChu').val(data.ghiChu || data.GhiChu || '');
+        $('select[name="NoiCungCap"]').val(data.nhaCungCapId || data.NhaCungCapId || '').trigger('change');
+
+        // clear bảng chi tiết
+        isLoadingPhieu = true;
+        $('#tableChiTiet #tableBody').empty();
+        rowIndex = 0;
+
+        const chiTiet = data.chiTiet || data.ChiTiet || [];
+        console.log(chiTiet);
+        // tạo dòng theo chi tiết
+        chiTiet.forEach((ct, idx) => {
+            addNewRow();
+            const $row = $('#tableChiTiet #tableBody tr').last();
+
+            // set hàng hóa
+            const hangHoaId = ct.hangHoaId || ct.HangHoaId;
+            $row.find('.hangHoaSelect').val(hangHoaId).trigger('change');
+            
+            // ghi đè lại các giá trị số lượng, đơn giá, ck, vat, ngày...
+            $row.find('.tdSoLuong').val(ct.soLuong || ct.SoLuong || 0);
+            $row.find('.tdDvtNhap').text(ct.donViTinhNhap || '');
+            $row.find('.tdSlqd').text(ct.soLuongQuyDoi || ct.SoLuongQuyDoi || '');
+            $row.find('.tdDonGia').val(ct.donGiaNhap || ct.DonGiaNhap || 0);
+            $row.find('.tdChietKhauPhanTram').val(ct.chietKhauPhanTram || ct.ChietKhauPhanTram || 0);
+            $row.find('.tdChietKhauSoTien').val(ct.chietKhauSoTien || ct.ChietKhauSoTien || 0);
+            $row.find('.tdVat').val(ct.vat || ct.Vat || 0);
+            $row.find('input[name*="NgaySanXuat"]').val(ct.ngaySanXuat || ct.NgaySanXuat ? (ct.ngaySanXuat || ct.NgaySanXuat).substring(0, 10) : '');
+            $row.find('input[name*="HanSuDung"]').val(ct.hanSuDung || ct.HanSuDung ? (ct.hanSuDung || ct.HanSuDung).substring(0, 10) : '');
+            $row.find('select[name*="SoLo"]').val(ct.soLo || ct.SoLo || '');
+            $row.find('input[name*="GhiChu"]').val(ct.ghiChu || ct.GhiChu || '');
+
+            calcRow($row);
+        });
+
+        // thêm 1 dòng trống cuối cho user nhập thêm
+        addNewRow();
+        isLoadingPhieu = false;
+
+        // cập nhật tổng
+        updateFooterTotals();
+
+        // chuyển qua tab Lập phiếu
+        switchTab('lapphieu');
+    } catch (err) {
+        console.error(err);
+        showError('Lỗi khi tải phiếu nhập để chỉnh sửa');
+        isLoadingPhieu = false;
+    }
+}

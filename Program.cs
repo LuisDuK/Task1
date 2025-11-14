@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using QLHangHoa.Models;
+using QuestPDF.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,7 +19,7 @@ if (!app.Environment.IsDevelopment())
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
-
+QuestPDF.Settings.License = LicenseType.Community;
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
@@ -26,6 +27,9 @@ app.UseRouting();
 
 app.UseAuthorization();
 
+app.MapControllers();
+
+// Map route cho MVC/Views
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
