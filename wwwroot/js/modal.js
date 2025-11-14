@@ -34,3 +34,21 @@ document.getElementById("notifyOverlay").addEventListener("click", (e) => {
 function showSuccess(msg) { showNotifyModal({ type: "success", title: "Thành công", message: msg }); }
 function showError(msg) { showNotifyModal({ type: "error", title: "Có lỗi", message: msg, duration: 4000 }); }
 function showInfo(msg) { showNotifyModal({ type: "info", title: "Thông báo", message: msg }); }
+
+
+function openConfirmDeleteModal(phieuNhapId) {
+    // Lưu ID vào button
+    $('#btnConfirmDelete').data('id', phieuNhapId);
+
+    const overlay = document.getElementById('confirmDeleteOverlay');
+
+    overlay.style.display = 'flex';
+}
+
+function closeConfirmDeleteModal() {
+    document.getElementById('confirmDeleteOverlay').style.display = 'none';
+}
+$('#btnConfirmDelete').on('click', function () {
+    const id = $(this).data('id');
+    deletePhieuNhap(id);
+});

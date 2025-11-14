@@ -42,7 +42,7 @@ function showDropdown(input) {
 document.addEventListener('DOMContentLoaded', function () {
     initDropdowns();
     addNewRow(); // dòng đầu tiên
-
+    renderTable();
 });
 // NẠP NƠI CUNG CẤP
 function initDropdowns() {
@@ -391,9 +391,6 @@ async function savePhieuNhap() {
     }
 }
 
-
-
-
 // Tab2
 
 const $filterHangHoa = $('#filterHangHoa');
@@ -416,48 +413,7 @@ function initFilterHangHoa($select) {
         width: 'resolve'
     });
 }
-var tbody = document.getElementById('tbodyPhieuNhap');
- 
-// Hiển thị 
-phieuNhapData.forEach((p, index) => {
-    var tr = document.createElement('tr');
-    tr.innerHTML = `
-                    <td class="text-center">${index + 1}</td>
-                    <td>${p.SoHoaDon}</td>
-                    <td>${new Date(p.NgayHoaDon).toLocaleString()}</td>
-                    <td>${new Date(p.NgayNhap).toLocaleString()}</td>
-                    <td>${p.TenNhaCungCap}</td>
-                    <td class="text-right">${p.TongTienHang?.toLocaleString()}</td>
-                    <td class="text-right">${p.TongChietKhau?.toLocaleString()}</td>
-                    <td class="text-right">${p.TongThue?.toLocaleString()}</td>
-                    <td class="text-right">${p.TongCong?.toLocaleString()}</td>
-                    <td>${p.NguoiNhap}</td>
-                    <td>${p.MaPhieuNhap}</td>
-                    <td class="text-center">
-                        <!-- In PDF -->
-                        <button class="action-icon-btn btn-in-pdf" data-id="${p.PhieuNhapId}" title="In PDF" onclick="exportPdf(${p.PhieuNhapId})">
-                            <i class="fas fa-file-pdf"></i>
-                        </button>
 
-                        <!-- In Excel -->
-                        <button class="action-icon-btn btn-in-excel" data-id="${p.PhieuNhapId}" title="In Excel" onclick="exportExcel(${p.PhieuNhapId})">
-                            <i class="fas fa-file-excel"></i>
-                        </button>
-
-                        <!-- Chỉnh sửa -->
-                        <button class="action-icon-btn btn-edit" data-id="${p.PhieuNhapId}" title="Chỉnh sửa">
-                            <i class="fas fa-edit"></i>
-                        </button>
-
-                        <!-- Xóa -->
-                        <button class="action-icon-btn btn-delete" data-id="${p.PhieuNhapId}" title="Xóa" onclick="openConfirmDeleteModal(${p.PhieuNhapId})">
-                            <i class="fas fa-trash"></i>
-                        </button>
-
-                    </td>
-                `;
-    tbody.appendChild(tr);
-});
 // EXPORT PDF
 function exportPdf(phieuNhapId) {
 
@@ -534,30 +490,16 @@ function deletePhieuNhap(phieuNhapId) {
             return response.json();
         })
         .then(data => {
-            alert(data.message);
+            showSuccess("Đã xóa thành công!");
             // Reload hoặc remove row khỏi bảng
-            location.reload();
+            //location.reload();
         })
         .catch(err => {
             console.error(err);
             alert("Lỗi: " + err.message);
         });
 }
-function openConfirmDeleteModal(phieuNhapId) {
-    // Lưu ID vào button
-    $('#btnConfirmDelete').data('id', phieuNhapId);
 
-    // Hiện modal
-    $('#confirmDeleteOverlay').fadeIn(150);
-}
-
-function closeConfirmDeleteModal() {
-    $('#confirmDeleteOverlay').fadeOut(150);
-}
-$('#btnConfirmDelete').on('click', function () {
-    const id = $(this).data('id');
-    deletePhieuNhap(id);
-});
 let editingPhieuId = null;
 let isLoadingPhieu = false;
 $(document).on('click', '.btn-edit', function () {
@@ -631,4 +573,82 @@ async function loadPhieuNhapForEdit(id) {
         showError('Lỗi khi tải phiếu nhập để chỉnh sửa');
         isLoadingPhieu = false;
     }
+}
+
+let currentPage = 1;
+let pageSize = 10; 
+function renderTable() {
+    const tbody = document.getElementById('tbodyPhieuNhap');
+    tbody.innerHTML = "";
+
+    const start = (currentPage - 1) * pageSize;
+    const end = start + pageSize;
+
+    const pageData = phieuNhapData.slice(start, end);
+
+    pageData.forEach((p, index) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td class="text-center">${start + index + 1}</td>
+            <td>${p.SoHoaDon}</td>
+            <td>${new Date(p.NgayHoaDon).toLocaleDateString()}</td>
+            <td>${new Date(p.NgayNhap).toLocaleDateString()}</td>
+            <td>${p.TenNhaCungCap}</td>
+            <td class="text-right">${p.TongTienHang?.toLocaleString()}</td>
+            <td class="text-right">${p.TongChietKhau?.toLocaleString()}</td>
+            <td class="text-right">${p.TongThue?.toLocaleString()}</td>
+            <td class="text-right">${p.TongCong?.toLocaleString()}</td>
+            <td>${p.NguoiNhap}</td>
+            <td>${p.MaPhieuNhap}</td>
+            <td class="text-center">
+
+                <button class="action-icon-btn btn-in-pdf" onclick="exportPdf(${p.PhieuNhapId})">
+                    <i class="fas fa-file-pdf"></i>
+                </button>
+
+                <button class="action-icon-btn btn-in-excel" onclick="exportExcel(${p.PhieuNhapId})">
+                    <i class="fas fa-file-excel"></i>
+                </button>
+
+                <button class="action-icon-btn btn-edit" data-id="${p.PhieuNhapId}">
+                    <i class="fas fa-edit"></i>
+                </button>
+
+                <button class="action-icon-btn btn-delete" onclick="openConfirmDeleteModal(${p.PhieuNhapId})">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </td>
+        `;
+        tbody.appendChild(tr);
+    });
+
+    renderPagination();
+}
+function renderPagination() {
+    const totalPages = Math.ceil(phieuNhapData.length / pageSize);
+    const container = document.getElementById("pageNumbers");
+
+    container.innerHTML = "";
+
+    // Nút Prev
+    if (currentPage > 1) {
+        container.innerHTML += `<button onclick="gotoPage(${currentPage - 1})">«</button>`;
+    }
+
+    for (let i = 1; i <= totalPages; i++) {
+        container.innerHTML += `
+            <button class="${i === currentPage ? 'active' : ''}" onclick="gotoPage(${i})">
+                ${i}
+            </button>
+        `;
+    }
+
+    // Nút Next
+    if (currentPage < totalPages) {
+        container.innerHTML += `<button onclick="gotoPage(${currentPage + 1})">»</button>`;
+    }
+}
+function gotoPage(page) {
+    currentPage = page;
+    renderTable();
 }
